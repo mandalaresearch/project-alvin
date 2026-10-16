@@ -51,9 +51,23 @@
         .marquee-track i { color: #2BFF88; font-style: normal; font-size: .6em; }
         .marquee-track .hollow { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.55); }
         @keyframes mq { to { transform: translateX(-50%); } }
+        /* ---- fog / asap di bagian bawah ---- */
+        footer { position: relative; }
+        .fog { position: relative; height: 230px; margin-bottom: -230px; overflow: hidden; pointer-events: none;
+               -webkit-mask-image: linear-gradient(to top, black 25%, transparent 100%);
+               mask-image: linear-gradient(to top, black 25%, transparent 100%); }
+        .fog-layer { position: absolute; bottom: -70px; width: 62vw; height: 250px; border-radius: 50%;
+                     filter: blur(55px); opacity: .55; will-change: transform; }
+        .f1 { left: -12%; background: radial-gradient(ellipse, rgba(43,255,136,.32), transparent 70%); animation: drift1 15s ease-in-out infinite alternate; }
+        .f2 { left: 22%; background: radial-gradient(ellipse, rgba(170,190,205,.30), transparent 70%); animation: drift2 19s ease-in-out infinite alternate; }
+        .f3 { left: 58%; background: radial-gradient(ellipse, rgba(43,255,136,.26), transparent 70%); animation: drift3 17s ease-in-out infinite alternate; }
+        .f4 { left: 80%; background: radial-gradient(ellipse, rgba(170,190,205,.24), transparent 70%); animation: drift2 22s ease-in-out infinite alternate-reverse; }
+        @keyframes drift1 { to { transform: translateX(20vw); } }
+        @keyframes drift2 { to { transform: translateX(-16vw); } }
+        @keyframes drift3 { to { transform: translateX(13vw); } }
         #webgl-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         #webgl-bg canvas { display: block; width: 100%; height: 100%; }
-        @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } }
+        @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .fog-layer, .marquee-track { animation: none; } }
     </style>
 </head>
 <body class="antialiased pb-24 md:pb-0">
@@ -294,6 +308,14 @@
         </div>
         <p class="text-neutral-500 text-sm">Jalan Raya Bancar Bungkal, Dukuh Ngolododo RT 03 RW 03<br><span class="text-neutral-300 font-semibold">Mandala Playstation</span></p>
     </section>
+
+    <!-- FOG / ASAP BAWAH -->
+    <div class="fog" aria-hidden="true">
+        <div class="fog-layer f1"></div>
+        <div class="fog-layer f2"></div>
+        <div class="fog-layer f3"></div>
+        <div class="fog-layer f4"></div>
+    </div>
 
     <footer class="border-t border-white/10">
         <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-4">
