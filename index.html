@@ -51,6 +51,9 @@
         .marquee-track i { color: #2BFF88; font-style: normal; font-size: .6em; }
         .marquee-track .hollow { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.55); }
         @keyframes mq { to { transform: translateX(-50%); } }
+        /* ---- scroll reveal ---- */
+        html.js .rv { opacity: 0; transform: translateY(46px); transition: opacity .7s ease-out, transform .7s cubic-bezier(.22,.8,.28,1); transition-delay: var(--d, 0s); }
+        html.js .rv.in { opacity: 1; transform: translateY(0); }
         /* ---- interactive smoke (bisa disentuh) ---- */
         #smokeSec { touch-action: pan-y; }
         #smokeCanvas { display: block; touch-action: pan-y; cursor: crosshair;
@@ -89,20 +92,20 @@
     <!-- HERO -->
     <header id="beranda" class="relative overflow-hidden scroll-mt-20">
         <div class="max-w-6xl mx-auto px-6 pt-44 pb-24 relative">
-            <p class="eyebrow mb-6"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
-            <h1 class="display text-7xl md:text-9xl mb-6">
+            <p class="eyebrow mb-6 rv" style="--d:.05s"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
+            <h1 class="display text-7xl md:text-9xl mb-6 rv" style="--d:.12s">
                 Social Hub<br><span class="neon">Experience.</span>
             </h1>
-            <p class="text-neutral-400 text-lg max-w-xl mb-10">
+            <p class="text-neutral-400 text-lg max-w-xl mb-10 rv" style="--d:.2s">
                 Sewa PS3 &amp; PS4 HEN dengan full game HDD, 2 stick, dan layanan antar-jemput radius 2&nbsp;km.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col sm:flex-row gap-4 rv" style="--d:.28s">
                 <a href="https://wa.me/+6289524506743" class="btn-neon px-8 py-4 font-extrabold text-center tracking-wide">
                     <i class="fab fa-whatsapp mr-2"></i>BOOKING WHATSAPP
                 </a>
                 <a href="#harga" class="btn-outline px-8 py-4 font-bold text-center tracking-wide">LIHAT HARGA</a>
             </div>
-            <div class="flex gap-8 mt-12 text-sm">
+            <div class="flex gap-8 mt-12 text-sm rv" style="--d:.36s">
                 <div><span class="display text-3xl">500+</span><div class="text-neutral-500 text-xs tracking-widest mt-1">PELANGGAN</div></div>
                 <div><span class="display text-3xl">100+</span><div class="text-neutral-500 text-xs tracking-widest mt-1">GAME READY</div></div>
                 <div><span class="display text-3xl neon">24/7</span><div class="text-neutral-500 text-xs tracking-widest mt-1">LAYANAN</div></div>
@@ -113,7 +116,7 @@
     <!-- PROMO CARDS -->
     <section class="max-w-6xl mx-auto px-6 pb-20">
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="card-dark overflow-hidden relative">
+            <div class="card-dark overflow-hidden relative rv" style="--d:0s">
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(180,30,30,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
                     <p class="eyebrow mb-3" style="color:#ff8a8a">Paket Hemat</p>
@@ -122,7 +125,7 @@
                     <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20booking%20PS3" class="btn-outline inline-block px-6 py-3 text-sm font-bold tracking-wide">PILIH PS3</a>
                 </div>
             </div>
-            <div class="card-dark overflow-hidden relative">
+            <div class="card-dark overflow-hidden relative rv" style="--d:.12s">
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(30,90,200,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
                     <p class="eyebrow mb-3 neon">Paling Laris</p>
@@ -137,17 +140,17 @@
     <!-- FITUR -->
     <section class="max-w-6xl mx-auto px-6 pb-24">
         <div class="grid md:grid-cols-3 gap-6">
-            <div class="card-dark p-8">
+            <div class="card-dark p-8 rv" style="--d:0s">
                 <div class="icon-tile mb-6"><i class="fas fa-layer-group"></i></div>
                 <h3 class="display text-3xl mb-3">Pilih Paketmu</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">PS3 &amp; PS4 HEN, durasi 6 / 12 / 24 jam. Tambah TV LED 32" biar makin puas.</p>
             </div>
-            <div class="card-dark p-8">
+            <div class="card-dark p-8 rv" style="--d:.12s">
                 <div class="icon-tile mb-6"><i class="fas fa-hdd"></i></div>
                 <h3 class="display text-3xl mb-3">Full Game HDD</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">100+ game siap main. Patch bola terbaru: Monster Patch, SGR Patch, Gembox Patch.</p>
             </div>
-            <div class="card-dark p-8">
+            <div class="card-dark p-8 rv" style="--d:.24s">
                 <div class="icon-tile mb-6"><i class="fas fa-truck"></i></div>
                 <h3 class="display text-3xl mb-3">Antar-Jemput</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">Gratis antar-jemput radius 2 km. Unit datang lengkap: 2 stick + semua kabel.</p>
@@ -159,12 +162,12 @@
     <section id="game" class="pb-24 scroll-mt-20">
         <div class="max-w-6xl mx-auto px-6 mb-8 flex items-end justify-between">
             <div>
-                <p class="eyebrow mb-3">Koleksi</p>
-                <h2 class="display text-5xl md:text-6xl">Game Terlaris</h2>
+                <p class="eyebrow mb-3 rv">Koleksi</p>
+                <h2 class="display text-5xl md:text-6xl rv" style="--d:.1s">Game Terlaris</h2>
             </div>
             <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20tanya%20daftar%20game" class="hidden md:inline-block btn-outline px-6 py-3 text-sm font-bold tracking-wide">TANYA GAME LAIN</a>
         </div>
-        <div class="max-w-6xl mx-auto px-6">
+        <div class="max-w-6xl mx-auto px-6 rv" style="--d:.15s">
             <div class="cf-stage" id="cfStage">
                 <div class="cf-card">
                     <div class="card-dark p-5 h-full">
@@ -213,9 +216,9 @@
 
     <!-- GAMEPLAY -->
     <section id="gameplay" class="max-w-6xl mx-auto px-6 pb-24 scroll-mt-20">
-        <p class="eyebrow mb-3">Gameplay</p>
-        <h2 class="display text-5xl md:text-6xl mb-8">PES 2027 <span class="neon">Gembox.</span></h2>
-        <div class="card-dark overflow-hidden">
+        <p class="eyebrow mb-3 rv">Gameplay</p>
+        <h2 class="display text-5xl md:text-6xl mb-8 rv" style="--d:.1s">PES 2027 <span class="neon">Gembox.</span></h2>
+        <div class="card-dark overflow-hidden rv" style="--d:.18s">
             <div class="relative w-full" style="padding-top:56.25%">
                 <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/itQhSs8X-n0?rel=0" title="PES 2027 Gembox Patch Gameplay" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
@@ -230,10 +233,10 @@
 
     <!-- HARGA -->
     <section id="harga" class="max-w-6xl mx-auto px-6 pb-24 scroll-mt-20">
-        <p class="eyebrow mb-3">Harga Sewa</p>
-        <h2 class="display text-5xl md:text-6xl mb-10">Satu Harga,<br>Semua Lengkap.</h2>
+        <p class="eyebrow mb-3 rv">Harga Sewa</p>
+        <h2 class="display text-5xl md:text-6xl mb-10 rv" style="--d:.1s">Satu Harga,<br>Semua Lengkap.</h2>
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="card-dark p-8 md:p-10">
+            <div class="card-dark p-8 md:p-10 rv" style="--d:.15s">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="display text-3xl">PlayStation 3</h3>
                     <span class="text-xs font-bold tracking-widest text-neutral-400 border border-white/15 rounded-full px-4 py-1">HEMAT</span>
@@ -252,7 +255,7 @@
                 </ul>
                 <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20booking%20PS3" class="btn-outline block text-center py-3.5 font-bold tracking-wide">SEWA PS3</a>
             </div>
-            <div class="card-dark p-8 md:p-10" style="border-color:rgba(43,255,136,.35)">
+            <div class="card-dark p-8 md:p-10 rv" style="--d:.27s;border-color:rgba(43,255,136,.35)">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="display text-3xl">PlayStation 4 <span class="neon">HEN</span></h3>
                     <span class="text-xs font-bold tracking-widest text-black rounded-full px-4 py-1" style="background:#2BFF88">LARIS</span>
@@ -276,7 +279,7 @@
 
     <!-- PROMO BANNER -->
     <section class="max-w-6xl mx-auto px-6 pb-24">
-        <div class="card-dark overflow-hidden relative">
+        <div class="card-dark overflow-hidden relative rv">
             <div class="absolute inset-0" style="background:linear-gradient(120deg,rgba(43,255,136,.14),rgba(11,11,13,.05) 60%)"></div>
             <div class="relative p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
                 <div>
@@ -290,14 +293,14 @@
 
     <!-- KONTAK -->
     <section id="kontak" class="max-w-3xl mx-auto px-6 pb-28 text-center scroll-mt-20">
-        <p class="eyebrow mb-4">Kontak</p>
-        <h2 class="display text-6xl md:text-7xl mb-6">Siap Main?</h2>
-        <p class="text-neutral-400 mb-10">Chat langsung via WhatsApp — fast respon, booking langsung jalan.</p>
-        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+        <p class="eyebrow mb-4 rv">Kontak</p>
+        <h2 class="display text-6xl md:text-7xl mb-6 rv" style="--d:.1s">Siap Main?</h2>
+        <p class="text-neutral-400 mb-10 rv" style="--d:.18s">Chat langsung via WhatsApp — fast respon, booking langsung jalan.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-12 rv" style="--d:.26s">
             <a href="https://wa.me/+6289524506743" class="btn-neon px-8 py-4 font-extrabold tracking-wide"><i class="fab fa-whatsapp mr-2"></i>+62 895-2450-6743</a>
             <a href="https://maps.app.goo.gl/9NZ4PyeLLEa3eDRz9" target="_blank" class="btn-outline px-8 py-4 font-bold tracking-wide"><i class="fas fa-map-marker-alt mr-2"></i>GOOGLE MAPS</a>
         </div>
-        <p class="text-neutral-500 text-sm">Jalan Raya Bancar Bungkal, Dukuh Ngolododo RT 03 RW 03<br><span class="text-neutral-300 font-semibold">Mandala Playstation</span></p>
+        <p class="text-neutral-500 text-sm rv" style="--d:.32s">Jalan Raya Bancar Bungkal, Dukuh Ngolododo RT 03 RW 03<br><span class="text-neutral-300 font-semibold">Mandala Playstation</span></p>
     </section>
 
     <!-- INTERACTIVE SMOKE -->
@@ -741,6 +744,20 @@
             ctx.globalCompositeOperation = 'source-over';
         }
         loop();
+    })();
+    </script>
+
+    <!-- Scroll reveal -->
+    <script>
+    (function(){
+        document.documentElement.classList.add('js');
+        if(!('IntersectionObserver' in window)){ document.documentElement.classList.remove('js'); return; }
+        var io = new IntersectionObserver(function(es){
+            es.forEach(function(e){
+                if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
     })();
     </script>
 
