@@ -272,7 +272,131 @@
         <a href="#kontak" class="flex flex-col items-center gap-1 text-neutral-400"><i class="fas fa-phone"></i><span class="text-[10px] font-bold tracking-wide">KONTAK</span></a>
     </nav>
 
-    <!-- Floating WhatsApp -->
+        <!-- AI CHATBOT -->
+    <button id="chatFab" aria-label="Buka chat asisten"
+       class="fixed bottom-24 md:bottom-6 left-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
+       style="background:#2BFF88">
+        <i class="fas fa-robot text-2xl" style="color:#0B0B0D"></i>
+    </button>
+
+    <div id="chatPanel" class="hidden fixed z-[60] left-4 right-4 bottom-40 md:left-6 md:right-auto md:bottom-24 md:w-[360px] card-dark overflow-hidden flex flex-col" style="border-radius:1.25rem; height:min(480px, 62vh)">
+        <div class="flex items-center gap-3 px-4 py-3" style="border-bottom:1px solid rgba(255,255,255,.08)">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(43,255,136,.15)">
+                <i class="fas fa-robot" style="color:#2BFF88"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-extrabold tracking-wide text-white">MANDALAPS ASSISTANT</p>
+                <p class="text-[11px] text-neutral-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#2BFF88"></span>Online — balas otomatis</p>
+            </div>
+            <button id="chatClose" aria-label="Tutup chat" class="text-neutral-400 hover:text-white transition text-lg leading-none">&times;</button>
+        </div>
+        <div id="chatMsgs" class="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 text-sm"></div>
+        <div id="chatQuick" class="px-4 pb-2 flex flex-wrap gap-2"></div>
+        <div class="flex gap-2 px-4 pb-4">
+            <input id="chatInput" type="text" placeholder="Tulis pertanyaan..." autocomplete="off"
+                   class="flex-1 bg-transparent text-sm text-white placeholder-neutral-500 px-4 py-2.5 outline-none"
+                   style="border:1px solid rgba(255,255,255,.12); border-radius:9999px">
+            <button id="chatSend" aria-label="Kirim"
+                    class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 hover:scale-105 transition"
+                    style="background:#2BFF88">
+                <i class="fas fa-paper-plane text-sm" style="color:#0B0B0D"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        var WA = 'https://wa.me/+6289524506743';
+        var fab = document.getElementById('chatFab');
+        var panel = document.getElementById('chatPanel');
+        var msgs = document.getElementById('chatMsgs');
+        var quick = document.getElementById('chatQuick');
+        var input = document.getElementById('chatInput');
+        var sendBtn = document.getElementById('chatSend');
+        var opened = false;
+
+        var QUICK = ['Harga PS3', 'Harga PS4', 'Cara booking', 'Antar gratis?'];
+
+        function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function bubble(text, me){
+            var d = document.createElement('div');
+            d.className = me ? 'flex justify-end' : 'flex justify-start';
+            d.innerHTML = '<div class="px-3.5 py-2.5 max-w-[85%] text-[13px] leading-relaxed" style="border-radius:1rem;' +
+                (me ? 'background:#2BFF88;color:#0B0B0D;font-weight:600;border-bottom-right-radius:.25rem' : 'background:rgba(255,255,255,.07);color:#e8e8e8;border-bottom-left-radius:.25rem') + '">' + text + '</div>';
+            msgs.appendChild(d);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function typing(on){
+            var t = document.getElementById('chatTyping');
+            if(on && !t){
+                t = document.createElement('div');
+                t.id = 'chatTyping';
+                t.className = 'flex justify-start';
+                t.innerHTML = '<div class="px-4 py-3" style="background:rgba(255,255,255,.07);border-radius:1rem"><span class="text-neutral-400 text-xs">mengetik...</span></div>';
+                msgs.appendChild(t); msgs.scrollTop = msgs.scrollHeight;
+            } else if(!on && t){ t.remove(); }
+        }
+
+        function answer(q){
+            q = q.toLowerCase();
+            var has = function(){ for(var i=0;i<arguments.length;i++){ if(q.indexOf(arguments[i])!==-1) return true; } return false; };
+            if(has('halo','hallo','hai','pagi','siang','sore','malam','hello','hei')) return 'Halo! Aku asisten MandalaPS. Tanya soal <b>harga</b>, <b>cara booking</b>, atau <b>game</b> yang tersedia ya.';
+            if(has('ps4')) return '<b>PS4 HEN:</b><br>• 6 jam — Rp 35.000<br>• 12 jam — Rp 60.000<br>• 24 jam — Rp 100.000<br>Paket + TV 32" juga tersedia. Udah termasuk 2 stick + 100+ game.';
+            if(has('ps3')) return '<b>PS3:</b><br>• 6 jam — Rp 30.000<br>• 12 jam — Rp 55.000<br>• 24 jam — Rp 65.000<br>Udah termasuk 2 stick + 100+ game.';
+            if(has('harga','berapa','tarif','price')) return '<b>Harga sewa:</b><br>PS3: 6 jam 30rb | 12 jam 55rb | 24 jam 65rb<br>PS4: 6 jam 35rb | 12 jam 60rb | 24 jam 100rb<br>Paket + TV 32" tersedia.';
+            if(has('tv','televisi')) return 'Ada paket + <b>TV LED 32 inch</b>, cocok buat yang belum punya TV di rumah.';
+            if(has('booking','sewa','pesan','rental','order','cara','daftar')) return 'Gampang! Klik tombol <b>SEWA</b> di website ini atau langsung chat WhatsApp <a href="'+WA+'" target="_blank" style="color:#2BFF88;font-weight:700">+62 895-2450-6743</a>. Sebutin mau PS3/PS4, durasi, dan jam mainnya.';
+            if(has('antar','jemput','delivery','kirim')) return '<b>Antar-jemput GRATIS</b> radius 2 km. Di luar itu chat admin dulu ya.';
+            if(has('lokasi','alamat','dimana','di mana','tempat')) return 'Lokasi: <b>Jalan Raya Bancar Bungkal, Dukuh Ngolododo RT 03 RW 03</b>. Bisa antar ke rumahmu juga (gratis 2 km).';
+            if(has('game','pes','bola','gta')) return '<b>100+ game ready:</b> eFootball, PES Gembox Patch, GTA V, God of War, EA FC 24, dan banyak lagi. 2 stick udah termasuk.';
+            if(has('stick','stik')) return 'Dapet <b>2 stick</b> + kabel lengkap tiap sewa.';
+            if(has('jam','buka','tutup','operasional')) return 'Langsung chat WhatsApp aja buat cek slot — fast respon.';
+            if(has('bayar','dp','transfer','cash')) return 'Info pembayaran langsung tanya admin via WhatsApp ya: <a href="'+WA+'" target="_blank" style="color:#2BFF88;font-weight:700">+62 895-2450-6743</a>.';
+            if(has('makasih','terima kasih','thanks','thank')) return 'Sama-sama! Ditunggu bookingnya.';
+            return 'Hmm, aku kurang paham. Coba tanya soal <b>harga</b> atau <b>cara booking</b> — atau langsung chat admin: <a href="'+WA+'" target="_blank" style="color:#2BFF88;font-weight:700">WhatsApp</a>.';
+        }
+
+        function renderQuick(){
+            quick.innerHTML = '';
+            QUICK.forEach(function(q){
+                var b = document.createElement('button');
+                b.textContent = q;
+                b.className = 'text-[11px] font-bold px-3 py-1.5 transition hover:scale-105';
+                b.style.cssText = 'border:1px solid rgba(43,255,136,.4);color:#2BFF88;border-radius:9999px';
+                b.onclick = function(){ doAsk(q); };
+                quick.appendChild(b);
+            });
+        }
+
+        function doAsk(text){
+            text = (text||'').trim();
+            if(!text) return;
+            bubble(esc(text), true);
+            input.value = '';
+            typing(true);
+            setTimeout(function(){
+                typing(false);
+                bubble(answer(text), false);
+            }, 650);
+        }
+
+        fab.onclick = function(){
+            panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden') && !opened){
+                opened = true;
+                renderQuick();
+                setTimeout(function(){ bubble('Halo! Aku asisten MandalaPS. Mau tanya harga atau cara booking?', false); }, 300);
+            }
+        };
+        document.getElementById('chatClose').onclick = function(){ panel.classList.add('hidden'); };
+        sendBtn.onclick = function(){ doAsk(input.value); };
+        input.addEventListener('keydown', function(e){ if(e.key === 'Enter') doAsk(input.value); });
+    })();
+    </script>
+
+<!-- Floating WhatsApp -->
     <a href="https://wa.me/+6289524506743" target="_blank" aria-label="Chat WhatsApp"
        class="fixed bottom-24 md:bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
        style="background:#25d366">
