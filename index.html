@@ -33,6 +33,16 @@
         .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
         .game-card { min-width: 150px; }
+
+        /* ---- 3D effects ---- */
+        .tilt { transform-style: preserve-3d; will-change: transform; transition: transform .18s ease-out, box-shadow .3s ease; }
+        .tilt-glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s ease; z-index: 5;
+            background: radial-gradient(520px circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.13), transparent 45%); }
+        .tilt:hover .tilt-glare { opacity: 1; }
+        .tilt-lift { transform: translateZ(30px); }
+        .hero-3d { transform-style: preserve-3d; will-change: transform;
+            text-shadow: 0 1px 0 rgba(255,255,255,.07), 0 10px 34px rgba(0,0,0,.65); }
+        .btn-neon:active, .btn-outline:active { transform: translateY(2px) scale(.985); }
         @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } }
     </style>
 </head>
@@ -64,7 +74,7 @@
     <header id="beranda" class="relative overflow-hidden scroll-mt-20">
         <div class="max-w-6xl mx-auto px-6 pt-44 pb-24 relative">
             <p class="eyebrow mb-6"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
-            <h1 class="display text-7xl md:text-9xl mb-6">
+            <h1 id="heroTitle" class="display hero-3d text-7xl md:text-9xl mb-6">
                 Social Hub<br><span class="neon">Experience.</span>
             </h1>
             <p class="text-neutral-400 text-lg max-w-xl mb-10">
@@ -393,6 +403,63 @@
         document.getElementById('chatClose').onclick = function(){ panel.classList.add('hidden'); };
         sendBtn.onclick = function(){ doAsk(input.value); };
         input.addEventListener('keydown', function(e){ if(e.key === 'Enter') doAsk(input.value); });
+    })();
+    </script>
+
+    <!-- 3D tilt + parallax -->
+    <script>
+    (function(){
+        if(!window.matchMedia('(pointer:fine)').matches) return;
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var MAX = 9;
+
+        document.querySelectorAll('section .card-dark').forEach(function(card){
+            if(getComputedStyle(card).position === 'static') card.style.position = 'relative';
+            card.classList.add('tilt');
+            var glare = document.createElement('div');
+            glare.className = 'tilt-glare';
+            card.appendChild(glare);
+            var raf = null;
+            card.addEventListener('mousemove', function(e){
+                if(raf) return;
+                raf = requestAnimationFrame(function(){
+                    raf = null;
+                    var r = card.getBoundingClientRect();
+                    var px = (e.clientX - r.left) / r.width;
+                    var py = (e.clientY - r.top) / r.height;
+                    var rx = (0.5 - py) * MAX;
+                    var ry = (px - 0.5) * MAX;
+                    card.style.transform = 'perspective(950px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateZ(6px)';
+                    card.style.setProperty('--gx', (px*100).toFixed(1) + '%');
+                    card.style.setProperty('--gy', (py*100).toFixed(1) + '%');
+                });
+            });
+            card.addEventListener('mouseleave', function(){
+                if(raf){ cancelAnimationFrame(raf); raf = null; }
+                card.style.transform = '';
+            });
+        });
+
+        // Subtle hero parallax
+        var hero = document.getElementById('heroTitle');
+        var header = document.getElementById('beranda');
+        if(hero && header){
+            var hraf = null;
+            header.addEventListener('mousemove', function(e){
+                if(hraf) return;
+                hraf = requestAnimationFrame(function(){
+                    hraf = null;
+                    var r = header.getBoundingClientRect();
+                    var px = (e.clientX - r.left) / r.width - 0.5;
+                    var py = (e.clientY - r.top) / r.height - 0.5;
+                    hero.style.transform = 'perspective(900px) rotateY(' + (px*6).toFixed(2) + 'deg) rotateX(' + (-py*6).toFixed(2) + 'deg) translate3d(' + (px*14).toFixed(1) + 'px,' + (py*14).toFixed(1) + 'px,0)';
+                });
+            });
+            header.addEventListener('mouseleave', function(){
+                if(hraf){ cancelAnimationFrame(hraf); hraf = null; }
+                hero.style.transform = '';
+            });
+        }
     })();
     </script>
 
