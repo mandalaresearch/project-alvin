@@ -51,23 +51,12 @@
         .marquee-track i { color: #2BFF88; font-style: normal; font-size: .6em; }
         .marquee-track .hollow { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.55); }
         @keyframes mq { to { transform: translateX(-50%); } }
-        /* ---- fog / asap di bagian bawah ---- */
-        footer { position: relative; }
-        .fog { position: relative; height: 230px; margin-bottom: -230px; overflow: hidden; pointer-events: none;
-               -webkit-mask-image: linear-gradient(to top, black 25%, transparent 100%);
-               mask-image: linear-gradient(to top, black 25%, transparent 100%); }
-        .fog-layer { position: absolute; bottom: -70px; width: 62vw; height: 250px; border-radius: 50%;
-                     filter: blur(55px); opacity: .55; will-change: transform; }
-        .f1 { left: -12%; background: radial-gradient(ellipse, rgba(43,255,136,.32), transparent 70%); animation: drift1 15s ease-in-out infinite alternate; }
-        .f2 { left: 22%; background: radial-gradient(ellipse, rgba(170,190,205,.30), transparent 70%); animation: drift2 19s ease-in-out infinite alternate; }
-        .f3 { left: 58%; background: radial-gradient(ellipse, rgba(43,255,136,.26), transparent 70%); animation: drift3 17s ease-in-out infinite alternate; }
-        .f4 { left: 80%; background: radial-gradient(ellipse, rgba(170,190,205,.24), transparent 70%); animation: drift2 22s ease-in-out infinite alternate-reverse; }
-        @keyframes drift1 { to { transform: translateX(20vw); } }
-        @keyframes drift2 { to { transform: translateX(-16vw); } }
-        @keyframes drift3 { to { transform: translateX(13vw); } }
+        /* ---- interactive smoke (bisa disentuh) ---- */
+        #smokeSec { touch-action: pan-y; }
+        #smokeCanvas { display: block; touch-action: pan-y; cursor: crosshair; }
         #webgl-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         #webgl-bg canvas { display: block; width: 100%; height: 100%; }
-        @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .fog-layer, .marquee-track { animation: none; } }
+        @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .marquee-track { animation: none; } }
     </style>
 </head>
 <body class="antialiased pb-24 md:pb-0">
@@ -309,13 +298,14 @@
         <p class="text-neutral-500 text-sm">Jalan Raya Bancar Bungkal, Dukuh Ngolododo RT 03 RW 03<br><span class="text-neutral-300 font-semibold">Mandala Playstation</span></p>
     </section>
 
-    <!-- FOG / ASAP BAWAH -->
-    <div class="fog" aria-hidden="true">
-        <div class="fog-layer f1"></div>
-        <div class="fog-layer f2"></div>
-        <div class="fog-layer f3"></div>
-        <div class="fog-layer f4"></div>
-    </div>
+    <!-- INTERACTIVE SMOKE -->
+    <section id="smokeSec" class="relative overflow-hidden select-none" style="height:72vh;min-height:500px" aria-label="Asap interaktif">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
+            <span class="display text-center leading-none" style="font-size:clamp(3.5rem,17vw,13rem);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28)">MANDALAPS</span>
+        </div>
+        <canvas id="smokeCanvas" class="absolute inset-0 w-full h-full"></canvas>
+        <p class="absolute bottom-6 left-0 right-0 text-center text-neutral-500 text-sm pointer-events-none px-6">Sentuh &amp; seret — asapnya ngikutin jarimu</p>
+    </section>
 
     <footer class="border-t border-white/10">
         <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -636,6 +626,119 @@
         });
 
         layout(); start();
+    })();
+    </script>
+
+    <!-- Interactive smoke: bisa disentuh/diseret -->
+    <script>
+    (function(){
+        var cv = document.getElementById('smokeCanvas');
+        if(!cv) return;
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var ctx = cv.getContext('2d');
+        var W = 0, H = 0;
+        function resize(){
+            var DPR = Math.min(window.devicePixelRatio || 1, 2);
+            W = cv.clientWidth; H = cv.clientHeight;
+            cv.width = Math.max(1, W * DPR); cv.height = Math.max(1, H * DPR);
+            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+        resize();
+        addEventListener('resize', resize);
+
+        function field(x, y, t){
+            return Math.sin(x*0.008 + t*0.7) + Math.sin(y*0.011 - t*0.5) + Math.sin((x+y)*0.005 + t*0.3);
+        }
+
+        var P = [], MAX = 380;
+        function spawn(x, y, burst){
+            if(P.length >= MAX) P.shift();
+            P.push({
+                x: x + (Math.random()-0.5)*24,
+                y: y + (Math.random()-0.5)*24,
+                vx: (Math.random()-0.5)*0.6,
+                vy: (Math.random()-0.5)*0.6 - 0.35,
+                life: 1,
+                decay: 0.004 + Math.random()*0.008,
+                size: (burst ? 26 : 13) + Math.random()*30,
+                grow: 0.35 + Math.random()*0.5,
+                green: Math.random() < 0.22
+            });
+        }
+
+        var px = -1, py = -1, lastT = 0;
+        function pos(e){
+            var r = cv.getBoundingClientRect();
+            return { x: e.clientX - r.left, y: e.clientY - r.top };
+        }
+        cv.addEventListener('pointermove', function(e){
+            var p = pos(e), now = performance.now();
+            if(px >= 0){
+                var dt = Math.max(1, now - lastT);
+                var pvx = (p.x - px)/dt*16, pvy = (p.y - py)/dt*16;
+                for(var i=0;i<P.length;i++){
+                    var q = P[i], dx = q.x - p.x, dy = q.y - p.y, d2 = dx*dx + dy*dy;
+                    if(d2 < 14400){
+                        var f = 1 - Math.sqrt(d2)/120;
+                        q.vx += pvx*0.055*f + dx*0.0022*f;
+                        q.vy += pvy*0.055*f + dy*0.0022*f;
+                    }
+                }
+                var speed = Math.sqrt(pvx*pvx + pvy*pvy);
+                var nSpawn = Math.min(4, 1 + Math.floor(speed/12));
+                for(var s=0;s<nSpawn;s++) spawn(p.x, p.y, speed > 14);
+            }
+            px = p.x; py = p.y; lastT = now;
+        });
+        function endTouch(){ px = -1; }
+        cv.addEventListener('pointerleave', endTouch);
+        cv.addEventListener('pointercancel', endTouch);
+        cv.addEventListener('pointerup', endTouch);
+
+        var running = true, visible = true;
+        document.addEventListener('visibilitychange', function(){
+            running = !document.hidden;
+            if(running && visible) loop();
+        });
+        if('IntersectionObserver' in window){
+            new IntersectionObserver(function(es){
+                visible = es[0].isIntersecting;
+                if(visible && running) loop();
+            }, { threshold: 0.05 }).observe(cv);
+        }
+
+        var t0 = performance.now();
+        function loop(){
+            if(!running || !visible) return;
+            requestAnimationFrame(loop);
+            var t = (performance.now() - t0)/1000;
+            ctx.clearRect(0, 0, W, H);
+
+            if(Math.random() < 0.55) spawn(W*0.22 + (Math.random()-0.5)*70, H - 16, false);
+            if(Math.random() < 0.55) spawn(W*0.55 + (Math.random()-0.5)*70, H - 16, false);
+            if(Math.random() < 0.55) spawn(W*0.82 + (Math.random()-0.5)*70, H - 16, false);
+
+            ctx.globalCompositeOperation = 'lighter';
+            for(var i=P.length-1;i>=0;i--){
+                var q = P[i], a = field(q.x, q.y, t);
+                q.vx += Math.cos(a)*0.085;
+                q.vy += Math.sin(a)*0.085 - 0.016;
+                q.vx *= 0.985; q.vy *= 0.985;
+                q.x += q.vx; q.y += q.vy;
+                q.life -= q.decay;
+                q.size += q.grow;
+                if(q.life <= 0 || q.y < -90 || q.x < -90 || q.x > W+90){ P.splice(i,1); continue; }
+                var alpha = Math.max(0, q.life)*0.16, r = q.size;
+                var col = q.green ? '43,255,136' : '205,215,225';
+                var g = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, r);
+                g.addColorStop(0, 'rgba(' + col + ',' + alpha.toFixed(3) + ')');
+                g.addColorStop(1, 'rgba(' + col + ',0)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.2832); ctx.fill();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        loop();
     })();
     </script>
 
