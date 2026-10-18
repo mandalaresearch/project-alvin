@@ -54,6 +54,31 @@
         /* ---- scroll reveal ---- */
         html.js .rv { opacity: 0; transform: translateY(46px); transition: opacity .7s ease-out, transform .7s cubic-bezier(.22,.8,.28,1); transition-delay: var(--d, 0s); }
         html.js .rv.in { opacity: 1; transform: translateY(0); }
+        /* ---- neon glow headlines (Grid Runner language) ---- */
+        .glow { text-shadow: 0 0 22px rgba(43,255,136,.5), 0 0 90px rgba(43,255,136,.22); }
+        /* ---- typewriter cursor ---- */
+        .tw-cursor { display: inline-block; width: .07em; height: .85em; background: #2BFF88; margin-left: .1em;
+                     vertical-align: -0.06em; animation: twblink 1s step-end infinite; box-shadow: 0 0 14px rgba(43,255,136,.8); }
+        @keyframes twblink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+        /* ---- HUD character-select cards (Robot Battle Arena language) ---- */
+        .hud { position: relative; transition: transform .35s cubic-bezier(.22,.8,.28,1), border-color .35s ease, box-shadow .35s ease; }
+        .hud:hover { transform: translateY(-6px); border-color: rgba(43,255,136,.55); box-shadow: 0 24px 70px rgba(43,255,136,.14); }
+        .hud::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+                      background: repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 4px); }
+        .hud-corner { position: absolute; width: 26px; height: 26px; z-index: 2; pointer-events: none; opacity: .9; }
+        .hud-corner.tl { top: 10px; left: 10px; border-top: 2px solid #2BFF88; border-left: 2px solid #2BFF88; }
+        .hud-corner.tr { top: 10px; right: 10px; border-top: 2px solid #2BFF88; border-right: 2px solid #2BFF88; }
+        .hud-corner.bl { bottom: 10px; left: 10px; border-bottom: 2px solid #2BFF88; border-left: 2px solid #2BFF88; }
+        .hud-corner.br { bottom: 10px; right: 10px; border-bottom: 2px solid #2BFF88; border-right: 2px solid #2BFF88; }
+        .hud-tag { font-size: 10px; font-weight: 800; letter-spacing: .28em; color: #2BFF88; text-transform: uppercase; }
+        .stat-row { margin-top: .55rem; }
+        .stat-top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; letter-spacing: .22em; color: #9a9aa3; margin-bottom: .3rem; text-transform: uppercase; }
+        .stat-top b { color: #fff; }
+        .stat-bar { height: 6px; border-radius: 9999px; background: rgba(255,255,255,.09); overflow: hidden; }
+        .stat-fill { height: 100%; width: 0; border-radius: 9999px;
+                     background: linear-gradient(90deg, #189a55, #2BFF88); box-shadow: 0 0 12px rgba(43,255,136,.55);
+                     transition: width 1.3s cubic-bezier(.22,.8,.28,1) .25s; }
+        .rv.in .stat-fill { width: var(--w); }
         #webgl-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         #webgl-bg canvas { display: block; width: 100%; height: 100%; }
         @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .marquee-track { animation: none; } }
@@ -63,7 +88,7 @@
 
     <!-- VIDEO BACKGROUND -->
     <div class="aurora" aria-hidden="true">
-        <video class="aurora-video" autoplay muted loop playsinline preload="auto">
+        <video id="bgVideo" class="aurora-video" autoplay muted loop playsinline preload="auto">
             <source src="bg.mp4" type="video/mp4">
         </video>
     </div>
@@ -88,9 +113,7 @@
     <header id="beranda" class="relative overflow-hidden scroll-mt-20">
         <div class="max-w-6xl mx-auto px-6 pt-44 pb-24 relative">
             <p class="eyebrow mb-6 rv" style="--d:.05s"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
-            <h1 class="display text-7xl md:text-9xl mb-6 rv" style="--d:.12s">
-                Social Hub<br><span class="neon">Experience.</span>
-            </h1>
+            <h1 class="display text-7xl md:text-9xl mb-6 rv" id="heroTitle" style="--d:.12s">Social Hub<br><span class="neon glow">Experience.</span></h1>
             <p class="text-neutral-400 text-lg max-w-xl mb-10 rv" style="--d:.2s">
                 Sewa PS3 &amp; PS4 HEN dengan full game HDD, 2 stick, dan layanan antar-jemput radius 2&nbsp;km.
             </p>
@@ -111,21 +134,33 @@
     <!-- PROMO CARDS -->
     <section class="max-w-6xl mx-auto px-6 pb-20">
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="card-dark overflow-hidden relative rv" style="--d:0s">
+            <div class="card-dark hud overflow-hidden relative rv" style="--d:0s">
+                <span class="hud-corner tl"></span><span class="hud-corner tr"></span><span class="hud-corner bl"></span><span class="hud-corner br"></span>
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(180,30,30,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
-                    <p class="eyebrow mb-3" style="color:#ff8a8a">Paket Hemat</p>
+                    <p class="hud-tag mb-3">Paket Hemat — Select Unit</p>
                     <h3 class="display text-4xl md:text-5xl mb-3">PlayStation 3</h3>
-                    <p class="text-neutral-400 mb-6">Mulai <span class="text-white font-bold">Rp 30.000</span> / 6 jam — paling ramah di kantong.</p>
+                    <p class="text-neutral-400 mb-5">Mulai <span class="text-white font-bold">Rp 30.000</span> / 6 jam — paling ramah di kantong.</p>
+                    <div class="mb-7">
+                        <div class="stat-row"><div class="stat-top"><span>Performa</span><b>60%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:60%"></div></div></div>
+                        <div class="stat-row"><div class="stat-top"><span>Koleksi Game</span><b>85%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:85%"></div></div></div>
+                        <div class="stat-row"><div class="stat-top"><span>Value</span><b>100%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:100%"></div></div></div>
+                    </div>
                     <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20booking%20PS3" class="btn-outline inline-block px-6 py-3 text-sm font-bold tracking-wide">PILIH PS3</a>
                 </div>
             </div>
-            <div class="card-dark overflow-hidden relative rv" style="--d:.12s">
+            <div class="card-dark hud overflow-hidden relative rv" style="--d:.12s">
+                <span class="hud-corner tl"></span><span class="hud-corner tr"></span><span class="hud-corner bl"></span><span class="hud-corner br"></span>
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(30,90,200,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
-                    <p class="eyebrow mb-3 neon">Paling Laris</p>
+                    <p class="hud-tag mb-3">Paling Laris — Select Unit</p>
                     <h3 class="display text-4xl md:text-5xl mb-3">PlayStation 4 HEN</h3>
-                    <p class="text-neutral-400 mb-6">Mulai <span class="text-white font-bold">Rp 35.000</span> / 6 jam — grafis next-level.</p>
+                    <p class="text-neutral-400 mb-5">Mulai <span class="text-white font-bold">Rp 35.000</span> / 6 jam — grafis next-level.</p>
+                    <div class="mb-7">
+                        <div class="stat-row"><div class="stat-top"><span>Performa</span><b>95%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:95%"></div></div></div>
+                        <div class="stat-row"><div class="stat-top"><span>Koleksi Game</span><b>100%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:100%"></div></div></div>
+                        <div class="stat-row"><div class="stat-top"><span>Value</span><b>70%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:70%"></div></div></div>
+                    </div>
                     <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20booking%20PS4" class="btn-outline inline-block px-6 py-3 text-sm font-bold tracking-wide">PILIH PS4</a>
                 </div>
             </div>
@@ -212,7 +247,7 @@
     <!-- GAMEPLAY -->
     <section id="gameplay" class="max-w-6xl mx-auto px-6 pb-24 scroll-mt-20">
         <p class="eyebrow mb-3 rv">Gameplay</p>
-        <h2 class="display text-5xl md:text-6xl mb-8 rv" style="--d:.1s">PES 2027 <span class="neon">Gembox.</span></h2>
+        <h2 class="display text-5xl md:text-6xl mb-8 rv" style="--d:.1s">PES 2027 <span class="neon glow">Gembox.</span></h2>
         <div class="card-dark overflow-hidden rv" style="--d:.18s">
             <div class="relative w-full" style="padding-top:56.25%">
                 <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/itQhSs8X-n0?rel=0" title="PES 2027 Gembox Patch Gameplay" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
@@ -631,6 +666,59 @@
             });
         }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
         document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+    })();
+    </script>
+
+    <!-- Mouse-scrub video + typewriter hero (MotionSites design language, original implementation) -->
+    <script>
+    (function(){
+        var fine = window.matchMedia('(pointer:fine)').matches;
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* --- background video scrubbed by horizontal mouse movement --- */
+        var v = document.getElementById('bgVideo');
+        if(v && fine && !reduced){
+            v.removeAttribute('autoplay'); v.removeAttribute('loop'); v.pause();
+            var target = 0, seeking = false, dur = 0, ready = false, prevX = null;
+            function markReady(){ if(v.duration && isFinite(v.duration)){ dur = v.duration; ready = true; } }
+            v.addEventListener('loadedmetadata', markReady);
+            markReady();
+            window.addEventListener('mousemove', function(e){
+                if(!ready) return;
+                if(prevX === null){ prevX = e.clientX; return; }
+                var dx = e.clientX - prevX; prevX = e.clientX;
+                target += (dx / window.innerWidth) * 0.8 * dur;
+                if(target < 0) target = 0;
+                if(target > dur) target = dur;
+                if(!seeking){ seeking = true; try{ v.currentTime = target; }catch(_){ seeking = false; } }
+            }, { passive: true });
+            v.addEventListener('seeked', function(){
+                if(Math.abs(v.currentTime - target) > 0.06){ try{ v.currentTime = target; }catch(_){ seeking = false; } }
+                else seeking = false;
+            });
+            document.addEventListener('visibilitychange', function(){ if(document.hidden) seeking = false; });
+        }
+
+        /* --- typewriter hero headline --- */
+        var h1 = document.getElementById('heroTitle');
+        if(h1 && fine && !reduced){
+            var l1 = 'Social Hub', l2 = 'Experience.';
+            h1.innerHTML = '<span id="tw1"></span><br><span id="tw2" class="neon glow"></span><span class="tw-cursor" id="twCur"></span>';
+            var a = document.getElementById('tw1'), b = document.getElementById('tw2'), cur = document.getElementById('twCur');
+            var i = 0, j = 0;
+            setTimeout(function(){
+                var t1 = setInterval(function(){
+                    a.textContent = l1.slice(0, ++i);
+                    if(i >= l1.length){
+                        clearInterval(t1);
+                        var t2 = setInterval(function(){
+                            b.textContent = l2.slice(0, ++j);
+                            if(j >= l2.length){ clearInterval(t2); setTimeout(function(){ cur.style.display = 'none'; }, 1600); }
+                        }, 55);
+                    }
+                }, 70);
+            }, 900);
+        }
     })();
     </script>
 
