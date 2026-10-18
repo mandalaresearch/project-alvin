@@ -79,6 +79,11 @@
                      background: linear-gradient(90deg, #189a55, #2BFF88); box-shadow: 0 0 12px rgba(43,255,136,.55);
                      transition: width 1.3s cubic-bezier(.22,.8,.28,1) .25s; }
         .rv.in .stat-fill { width: var(--w); }
+        /* ---- hero image ---- */
+        .hero-img { width: 100%; border-radius: 1.5rem; border: 1px solid rgba(43,255,136,.25);
+                    box-shadow: 0 30px 90px rgba(43,255,136,.16);
+                    animation: herofloat 7s ease-in-out infinite; }
+        @keyframes herofloat { 0%,100% { transform: translateY(0) rotate(-.4deg); } 50% { transform: translateY(-14px) rotate(.4deg); } }
         #webgl-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         #webgl-bg canvas { display: block; width: 100%; height: 100%; }
         @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .marquee-track { animation: none; } }
@@ -111,9 +116,10 @@
 
     <!-- HERO -->
     <header id="beranda" class="relative overflow-hidden scroll-mt-20">
-        <div class="max-w-6xl mx-auto px-6 pt-44 pb-24 relative">
+        <div class="max-w-6xl mx-auto px-6 pt-36 md:pt-44 pb-24 relative grid lg:grid-cols-2 gap-12 items-center">
+            <div>
             <p class="eyebrow mb-6 rv" style="--d:.05s"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
-            <h1 class="display text-7xl md:text-9xl mb-6 rv" id="heroTitle" style="--d:.12s">Social Hub<br><span class="neon glow">Experience.</span></h1>
+            <h1 class="display text-6xl md:text-7xl xl:text-8xl mb-6 rv" id="heroTitle" style="--d:.12s">Social Hub<br><span class="neon glow">Experience.</span></h1>
             <p class="text-neutral-400 text-lg max-w-xl mb-10 rv" style="--d:.2s">
                 Sewa PS3 &amp; PS4 HEN dengan full game HDD, 2 stick, dan layanan antar-jemput radius 2&nbsp;km.
             </p>
@@ -127,6 +133,10 @@
                 <div><span class="display text-3xl">500+</span><div class="text-neutral-500 text-xs tracking-widest mt-1">PELANGGAN</div></div>
                 <div><span class="display text-3xl">100+</span><div class="text-neutral-500 text-xs tracking-widest mt-1">GAME READY</div></div>
                 <div><span class="display text-3xl neon">24/7</span><div class="text-neutral-500 text-xs tracking-widest mt-1">LAYANAN</div></div>
+            </div>
+            </div>
+            <div class="rv" style="--d:.3s">
+                <img src="hero-controller.jpg" alt="Stick controller neon MandalaPS" class="hero-img" loading="eager">
             </div>
         </div>
     </header>
@@ -515,41 +525,6 @@
             }));
             scene.add(particles);
 
-            // Centerpiece: wireframe torus knot + neon-edged core
-            var group = new THREE.Group();
-            var knot = new THREE.Mesh(
-                new THREE.TorusKnotGeometry(2.6, 0.72, 150, 20),
-                new THREE.MeshBasicMaterial({ color: NEON, wireframe: true, transparent: true, opacity: 0.32 })
-            );
-            var coreGeo = new THREE.IcosahedronGeometry(1.15, 0);
-            var core = new THREE.Mesh(coreGeo,
-                new THREE.MeshBasicMaterial({ color: 0x0b0b0d, transparent: true, opacity: 0.88 }));
-            var coreEdges = new THREE.LineSegments(new THREE.EdgesGeometry(coreGeo),
-                new THREE.LineBasicMaterial({ color: NEON, transparent: true, opacity: 0.9 }));
-            group.add(knot); group.add(core); group.add(coreEdges);
-
-            // Orbit rings
-            var rings = [];
-            for(i=0;i<3;i++){
-                var ring = new THREE.Mesh(
-                    new THREE.TorusGeometry(3.7 + i*1.35, 0.02, 8, 100),
-                    new THREE.MeshBasicMaterial({ color: NEON, transparent: true, opacity: 0.17 - i*0.045 })
-                );
-                ring.rotation.x = Math.PI/2.35;
-                ring.userData.speed = 0.05 + i*0.035;
-                ring.userData.dir = (i%2 ? -1 : 1);
-                rings.push(ring); scene.add(ring);
-            }
-
-            function place(){
-                var wide = innerWidth > 900;
-                group.position.x = wide ? 4.8 : 0;
-                group.position.y = wide ? 0.3 : 1.4;
-                rings.forEach(function(r){ r.position.x = group.position.x; r.position.y = group.position.y; });
-            }
-            place();
-            scene.add(group);
-
             var tx=0, ty=0, mx=0, my=0;
             addEventListener('mousemove', function(e){
                 tx = e.clientX/innerWidth - 0.5;
@@ -559,7 +534,6 @@
                 camera.aspect = innerWidth/innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(innerWidth, innerHeight);
-                place();
             });
 
             var running = true;
@@ -575,15 +549,6 @@
                 var t = clock.getElapsedTime();
                 mx += (tx-mx)*0.045; my += (ty-my)*0.045;
 
-                knot.rotation.x = t*0.12; knot.rotation.y = t*0.17;
-                core.rotation.y = -t*0.32; coreEdges.rotation.y = -t*0.32; coreEdges.rotation.x = t*0.2;
-                group.rotation.y = mx*0.6; group.rotation.x = my*0.42;
-                group.position.y += Math.sin(t*0.85)*0.0016;
-
-                rings.forEach(function(r){
-                    r.rotation.z = t*r.userData.speed*r.userData.dir;
-                    r.rotation.y = mx*0.4; r.rotation.x = Math.PI/2.35 + my*0.3;
-                });
                 particles.rotation.y = t*0.02 + mx*0.14;
                 particles.rotation.x = my*0.09;
 
@@ -591,7 +556,7 @@
                 container.style.opacity = Math.max(0, 1 - sy*1.7).toFixed(3);
                 camera.position.y = -sy*3.2;
                 camera.position.x += (mx*1.7 - camera.position.x)*0.05;
-                camera.lookAt(group.position.x*0.35, camera.position.y*0.4, 0);
+                camera.lookAt(0, camera.position.y*0.4, 0);
 
                 renderer.render(scene, camera);
             }
