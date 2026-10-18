@@ -80,7 +80,19 @@
                      background: linear-gradient(90deg, #189a55, #2BFF88); box-shadow: 0 0 12px rgba(43,255,136,.55);
                      transition: width 1.3s cubic-bezier(.22,.8,.28,1) .25s; }
         .rv.in .stat-fill { width: var(--w); }
-        /* ---- hero image ---- */
+        /* ---- mini chat FAB (single expandable button) ---- */
+        .mini-fab { width: 3rem; height: 3rem; border-radius: 9999px; background: #141417; border: 1px solid rgba(255,255,255,.14);
+                    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+                    transition: all .25s ease; box-shadow: 0 8px 24px rgba(0,0,0,.45); cursor: pointer; }
+        .mini-fab:hover { border-color: rgba(43,255,136,.55); color: #2BFF88; transform: scale(1.06); }
+        #miniFabMenu { display: none; }
+        #miniFabMenu.open { display: flex; animation: fabin .22s ease; }
+        @keyframes fabin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .mini-opt { display: flex; align-items: center; gap: .6rem; background: #141417; border: 1px solid rgba(255,255,255,.12);
+                    color: #fff; font-size: .8rem; font-weight: 600; padding: .6rem 1rem .6rem .85rem; border-radius: 9999px;
+                    transition: all .2s ease; box-shadow: 0 8px 24px rgba(0,0,0,.45); cursor: pointer; text-decoration: none; }
+        .mini-opt:hover { border-color: rgba(43,255,136,.55); transform: translateX(-3px); }
+        .mini-opt i { color: #2BFF88; font-size: 1rem; }
         .hero-img { width: 100%; border-radius: 1.5rem; border: 1px solid rgba(43,255,136,.25);
                     box-shadow: 0 30px 90px rgba(43,255,136,.16);
                     animation: herofloat 7s ease-in-out infinite; }
@@ -373,14 +385,16 @@
         <a href="#kontak" class="flex flex-col items-center gap-1 text-neutral-400"><i class="fas fa-phone"></i><span class="text-[10px] font-bold tracking-wide">KONTAK</span></a>
     </nav>
 
-        <!-- AI CHATBOT -->
-    <button id="chatFab" aria-label="Buka chat asisten"
-       class="fixed bottom-24 md:bottom-6 left-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
-       style="background:#2BFF88">
-        <i class="fas fa-robot text-2xl" style="color:#0B0B0D"></i>
-    </button>
+        <!-- MINI CHAT FAB (AI + WA, expandable) -->
+    <div id="miniFab" class="fixed z-[60] right-4 md:right-6 bottom-24 md:bottom-6 flex flex-col items-end gap-3">
+        <div id="miniFabMenu" class="flex-col items-end gap-2">
+            <button id="miniAi" class="mini-opt"><i class="fas fa-robot"></i><span>AI Assistant</span></button>
+            <a href="https://wa.me/+6289524506743" target="_blank" class="mini-opt"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+        </div>
+        <button id="miniFabBtn" aria-label="Buka menu chat" class="mini-fab"><i class="fas fa-comment-dots"></i></button>
+    </div>
 
-    <div id="chatPanel" class="hidden fixed z-[60] left-4 right-4 bottom-40 md:left-6 md:right-auto md:bottom-24 md:w-[360px] card-dark overflow-hidden flex flex-col" style="border-radius:1.25rem; height:min(480px, 62vh)">
+    <div id="chatPanel" class="hidden fixed z-[60] left-4 right-4 bottom-40 md:left-auto md:right-6 md:bottom-24 md:w-[360px] card-dark overflow-hidden flex flex-col" style="border-radius:1.25rem; height:min(480px, 62vh)">
         <div class="flex items-center gap-3 px-4 py-3" style="border-bottom:1px solid rgba(255,255,255,.08)">
             <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(43,255,136,.15)">
                 <i class="fas fa-robot" style="color:#2BFF88"></i>
@@ -408,7 +422,9 @@
     <script>
     (function(){
         var WA = 'https://wa.me/+6289524506743';
-        var fab = document.getElementById('chatFab');
+        var fabWrap = document.getElementById('miniFab');
+        var fabBtn = document.getElementById('miniFabBtn');
+        var fabMenu = document.getElementById('miniFabMenu');
         var panel = document.getElementById('chatPanel');
         var msgs = document.getElementById('chatMsgs');
         var quick = document.getElementById('chatQuick');
@@ -483,14 +499,25 @@
             }, 650);
         }
 
-        fab.onclick = function(){
-            panel.classList.toggle('hidden');
-            if(!panel.classList.contains('hidden') && !opened){
+        function openPanel(){
+            panel.classList.remove('hidden');
+            if(!opened){
                 opened = true;
                 renderQuick();
                 setTimeout(function(){ bubble('Halo! Aku asisten MandalaPS. Mau tanya harga atau cara booking?', false); }, 300);
             }
+        }
+        fabBtn.onclick = function(e){
+            e.stopPropagation();
+            fabMenu.classList.toggle('open');
         };
+        document.getElementById('miniAi').onclick = function(){
+            fabMenu.classList.remove('open');
+            openPanel();
+        };
+        document.addEventListener('click', function(e){
+            if(fabWrap && !fabWrap.contains(e.target)) fabMenu.classList.remove('open');
+        });
         document.getElementById('chatClose').onclick = function(){ panel.classList.add('hidden'); };
         sendBtn.onclick = function(){ doAsk(input.value); };
         input.addEventListener('keydown', function(e){ if(e.key === 'Enter') doAsk(input.value); });
@@ -698,12 +725,7 @@
     })();
     </script>
 
-<!-- Floating WhatsApp -->
-    <a href="https://wa.me/+6289524506743" target="_blank" aria-label="Chat WhatsApp"
-       class="fixed bottom-24 md:bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
-       style="background:#25d366">
-        <i class="fab fa-whatsapp text-3xl text-white"></i>
-    </a>
+<!-- (floating WhatsApp lama dihapus — digabung ke mini FAB) -->
 
 </body>
 </html>
