@@ -23,10 +23,10 @@
 
         /* Video background */
         .aurora { position: fixed; inset: 0; z-index: -3; overflow: hidden; background: #0B0B0D; pointer-events: none; }
-        .aurora-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .45; }
+        .aurora-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .8; }
         .vignette { position: fixed; inset: 0; z-index: -2; pointer-events: none;
-                    background: linear-gradient(rgba(11,11,13,.55), rgba(11,11,13,.55)),
-                                radial-gradient(ellipse at center, transparent 50%, rgba(5,5,7,.65) 100%); }
+                    background: linear-gradient(rgba(11,11,13,.28), rgba(11,11,13,.28)),
+                                radial-gradient(ellipse at center, transparent 55%, rgba(5,5,7,.5) 100%); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -645,7 +645,7 @@
         if(v && fine && !reduced){
             v.removeAttribute('autoplay'); v.removeAttribute('loop'); v.pause();
             var target = 0, seeking = false, dur = 0, ready = false, prevX = null;
-            function markReady(){ if(v.duration && isFinite(v.duration)){ dur = v.duration; ready = true; } }
+            function markReady(){ if(v.duration && isFinite(v.duration)){ dur = v.duration; ready = true; target = dur*0.3; try{ v.currentTime = target; }catch(_){} } }
             v.addEventListener('loadedmetadata', markReady);
             markReady();
             window.addEventListener('mousemove', function(e){
