@@ -85,6 +85,14 @@
                     box-shadow: 0 30px 90px rgba(43,255,136,.16);
                     animation: herofloat 7s ease-in-out infinite; }
         @keyframes herofloat { 0%,100% { transform: translateY(0) rotate(-.4deg); } 50% { transform: translateY(-14px) rotate(.4deg); } }
+        /* ---- mobile display scaling (Alte Haas Grotesk runs wider than the old condensed face) ---- */
+        html, body { overflow-x: clip; }
+        @media (max-width: 767px) {
+          .d-hero { font-size: 11vw !important; }
+          .d-h2 { font-size: 8vw !important; }
+          .d-h3 { font-size: 6.8vw !important; }
+          .d-h4 { font-size: 6vw !important; }
+        }
         #webgl-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         #webgl-bg canvas { display: block; width: 100%; height: 100%; }
         @media (prefers-reduced-motion: reduce) { .aurora-video { display: none; } .marquee-track { animation: none; } }
@@ -120,7 +128,7 @@
         <div class="max-w-6xl mx-auto px-6 pt-36 md:pt-44 pb-24 relative grid lg:grid-cols-2 gap-12 items-center">
             <div>
             <p class="eyebrow mb-6 rv" style="--d:.05s"><span class="neon mr-2">●</span> Rental PlayStation — Sejak 2017</p>
-            <h1 class="display text-6xl md:text-7xl xl:text-8xl mb-6 rv" id="heroTitle" style="--d:.12s">Social Hub<br><span class="neon glow">Experience.</span></h1>
+            <h1 class="display d-hero text-6xl md:text-7xl xl:text-8xl mb-6 rv" id="heroTitle" style="--d:.12s">Social Hub<br><span class="neon glow">Experience.</span></h1>
             <p class="text-neutral-400 text-lg max-w-xl mb-10 rv" style="--d:.2s">
                 Sewa PS3 &amp; PS4 HEN dengan full game HDD, 2 stick, dan layanan antar-jemput radius 2&nbsp;km.
             </p>
@@ -150,7 +158,7 @@
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(180,30,30,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
                     <p class="hud-tag mb-3">Paket Hemat — Select Unit</p>
-                    <h3 class="display text-4xl md:text-5xl mb-3">PlayStation 3</h3>
+                    <h3 class="display d-h3 text-4xl md:text-5xl mb-3">PlayStation 3</h3>
                     <p class="text-neutral-400 mb-5">Mulai <span class="text-white font-bold">Rp 30.000</span> / 6 jam — paling ramah di kantong.</p>
                     <div class="mb-7">
                         <div class="stat-row"><div class="stat-top"><span>Performa</span><b>60%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:60%"></div></div></div>
@@ -165,7 +173,7 @@
                 <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(30,90,200,.55),rgba(11,11,13,.1) 65%)"></div>
                 <div class="relative p-8 md:p-10">
                     <p class="hud-tag mb-3">Paling Laris — Select Unit</p>
-                    <h3 class="display text-4xl md:text-5xl mb-3">PlayStation 4 HEN</h3>
+                    <h3 class="display d-h3 text-4xl md:text-5xl mb-3">PlayStation 4 HEN</h3>
                     <p class="text-neutral-400 mb-5">Mulai <span class="text-white font-bold">Rp 35.000</span> / 6 jam — grafis next-level.</p>
                     <div class="mb-7">
                         <div class="stat-row"><div class="stat-top"><span>Performa</span><b>95%</b></div><div class="stat-bar"><div class="stat-fill" style="--w:95%"></div></div></div>
@@ -183,17 +191,17 @@
         <div class="grid md:grid-cols-3 gap-6">
             <div class="card-dark p-8 rv" style="--d:0s">
                 <div class="icon-tile mb-6"><i class="fas fa-layer-group"></i></div>
-                <h3 class="display text-3xl mb-3">Pilih Paketmu</h3>
+                <h3 class="display d-h4 text-3xl mb-3">Pilih Paketmu</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">PS3 &amp; PS4 HEN, durasi 6 / 12 / 24 jam. Tambah TV LED 32" biar makin puas.</p>
             </div>
             <div class="card-dark p-8 rv" style="--d:.12s">
                 <div class="icon-tile mb-6"><i class="fas fa-hdd"></i></div>
-                <h3 class="display text-3xl mb-3">Full Game HDD</h3>
+                <h3 class="display d-h4 text-3xl mb-3">Full Game HDD</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">100+ game siap main. Patch bola terbaru: Monster Patch, SGR Patch, Gembox Patch.</p>
             </div>
             <div class="card-dark p-8 rv" style="--d:.24s">
                 <div class="icon-tile mb-6"><i class="fas fa-truck"></i></div>
-                <h3 class="display text-3xl mb-3">Antar-Jemput</h3>
+                <h3 class="display d-h4 text-3xl mb-3">Antar-Jemput</h3>
                 <p class="text-neutral-400 text-sm leading-relaxed">Gratis antar-jemput radius 2 km. Unit datang lengkap: 2 stick + semua kabel.</p>
             </div>
         </div>
@@ -204,7 +212,7 @@
         <div class="max-w-6xl mx-auto px-6 mb-8 flex items-end justify-between">
             <div>
                 <p class="eyebrow mb-3 rv">Koleksi</p>
-                <h2 class="display text-5xl md:text-6xl rv" style="--d:.1s">Game Terlaris</h2>
+                <h2 class="display d-h2 text-5xl md:text-6xl rv" style="--d:.1s">Game Terlaris</h2>
             </div>
             <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20tanya%20daftar%20game" class="hidden md:inline-block btn-outline px-6 py-3 text-sm font-bold tracking-wide">TANYA GAME LAIN</a>
         </div>
@@ -258,7 +266,7 @@
     <!-- GAMEPLAY -->
     <section id="gameplay" class="max-w-6xl mx-auto px-6 pb-24 scroll-mt-20">
         <p class="eyebrow mb-3 rv">Gameplay</p>
-        <h2 class="display text-5xl md:text-6xl mb-8 rv" style="--d:.1s">PES 2027 <span class="neon glow">Gembox.</span></h2>
+        <h2 class="display d-h2 text-5xl md:text-6xl mb-8 rv" style="--d:.1s">PES 2027 <span class="neon glow">Gembox.</span></h2>
         <div class="card-dark overflow-hidden rv" style="--d:.18s">
             <div class="relative w-full" style="padding-top:56.25%">
                 <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/itQhSs8X-n0?rel=0" title="PES 2027 Gembox Patch Gameplay" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
@@ -275,7 +283,7 @@
     <!-- HARGA -->
     <section id="harga" class="max-w-6xl mx-auto px-6 pb-24 scroll-mt-20">
         <p class="eyebrow mb-3 rv">Harga Sewa</p>
-        <h2 class="display text-5xl md:text-6xl mb-10 rv" style="--d:.1s">Satu Harga,<br>Semua Lengkap.</h2>
+        <h2 class="display d-h2 text-5xl md:text-6xl mb-10 rv" style="--d:.1s">Satu Harga,<br>Semua Lengkap.</h2>
         <div class="grid md:grid-cols-2 gap-6">
             <div class="card-dark p-8 md:p-10 rv" style="--d:.15s">
                 <div class="flex items-center justify-between mb-8">
@@ -324,7 +332,7 @@
             <div class="absolute inset-0" style="background:linear-gradient(120deg,rgba(43,255,136,.14),rgba(11,11,13,.05) 60%)"></div>
             <div class="relative p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
                 <div>
-                    <h3 class="display text-4xl md:text-5xl mb-3">Belum Punya TV?</h3>
+                    <h3 class="display d-h3 text-4xl md:text-5xl mb-3">Belum Punya TV?</h3>
                     <p class="text-neutral-400 max-w-md">Ambil paket + TV LED 32 inch — tinggal main, nggak ribet.</p>
                 </div>
                 <a href="https://wa.me/+6289524506743?text=Halo,%20mau%20tanya%20paket%20%2B%20TV" class="btn-outline px-8 py-4 font-bold tracking-wide whitespace-nowrap">TANYA PAKET TV</a>
@@ -335,7 +343,7 @@
     <!-- KONTAK -->
     <section id="kontak" class="max-w-3xl mx-auto px-6 pb-28 text-center scroll-mt-20">
         <p class="eyebrow mb-4 rv">Kontak</p>
-        <h2 class="display text-6xl md:text-7xl mb-6 rv" style="--d:.1s">Siap Main?</h2>
+        <h2 class="display d-h2 text-6xl md:text-7xl mb-6 rv" style="--d:.1s">Siap Main?</h2>
         <p class="text-neutral-400 mb-10 rv" style="--d:.18s">Chat langsung via WhatsApp — fast respon, booking langsung jalan.</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4 mb-12 rv" style="--d:.26s">
             <a href="https://wa.me/+6289524506743" class="btn-neon px-8 py-4 font-extrabold tracking-wide"><i class="fab fa-whatsapp mr-2"></i>+62 895-2450-6743</a>
