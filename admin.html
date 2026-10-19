@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — MandalaPS Booking</title>
+<meta name="robots" content="noindex,nofollow">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:#0B0B0D;color:#e8e8f0;font-family:system-ui,sans-serif}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:1rem}
+  .neon{color:#2BFF88}
+  .inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:.75rem;padding:.7rem 1rem;color:#fff;outline:none}
+  .inp:focus{border-color:#2BFF88}
+  .btn{background:#2BFF88;color:#0B0B0D;font-weight:800;border-radius:.75rem;padding:.7rem 1.4rem}
+  .btn2{border:1px solid rgba(255,255,255,.2);border-radius:.6rem;padding:.4rem .9rem;font-size:.78rem;font-weight:700}
+  .pill{font-size:.68rem;font-weight:800;letter-spacing:.08em;border-radius:999px;padding:.25rem .7rem}
+  .st-pending{background:rgba(250,204,21,.15);color:#facc15}
+  .st-confirmed{background:rgba(43,255,136,.15);color:#2BFF88}
+  .st-cancelled{background:rgba(248,113,113,.15);color:#f87171}
+  .st-completed{background:rgba(148,163,184,.15);color:#94a3b8}
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-5xl mx-auto px-5 py-10">
+
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-2xl font-extrabold">MANDALA<span class="neon">PS</span> <span class="text-neutral-500 text-base font-normal">· Admin Booking</span></h1>
+    <button id="logoutBtn" class="btn2 text-neutral-400 hidden">Keluar</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card p-8 max-w-sm mx-auto mt-16">
+    <h2 class="text-xl font-bold mb-1">Masuk Admin</h2>
+    <p class="text-neutral-500 text-sm mb-6">Halaman ini khusus pemilik.</p>
+    <input id="pw" type="password" class="inp mb-4" placeholder="Password admin" autocomplete="current-password">
+    <button id="loginBtn" class="btn w-full">MASUK</button>
+    <p id="loginErr" class="text-red-400 text-sm mt-3 hidden">Password salah.</p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" class="hidden">
+    <div class="flex flex-wrap gap-2 mb-6" id="filters">
+      <button data-f="upcoming" class="btn2 fbtn" style="border-color:#2BFF88;color:#2BFF88">Mendatang</button>
+      <button data-f="pending" class="btn2 fbtn text-neutral-300">Menunggu</button>
+      <button data-f="all" class="btn2 fbtn text-neutral-300">Semua</button>
+    </div>
+    <div id="list" class="space-y-3"></div>
+    <p id="empty" class="text-neutral-500 text-center py-10 hidden">Belum ada booking.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var filter='upcoming', all=[];
+  var loginBox=document.getElementById('loginBox'), dash=document.getElementById('dash');
+
+  function fmt(iso){
+    var d=new Date(iso);
+    return d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'})+' · '+
+      d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  }
+  function waLink(wa){ return 'https://wa.me/'+wa.replace(/\D/g,''); }
+
+  async function load(){
+    var r=await fetch('/api/admin');
+    if(r.status===401){ showLogin(); return; }
+    var j=await r.json(); all=j.bookings||[]; render();
+  }
+  function showLogin(){ loginBox.classList.remove('hidden'); dash.classList.add('hidden'); document.getElementById('logoutBtn').classList.add('hidden'); }
+  function showDash(){ loginBox.classList.add('hidden'); dash.classList.remove('hidden'); document.getElementById('logoutBtn').classList.remove('hidden'); }
+
+  document.getElementById('loginBtn').onclick=async function(){
+    var pw=document.getElementById('pw').value;
+    var r=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:pw})});
+    if(r.ok){ showDash(); load(); }
+    else document.getElementById('loginErr').classList.remove('hidden');
+  };
+  document.getElementById('pw').addEventListener('keydown',function(e){ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+  document.getElementById('logoutBtn').onclick=function(){ document.cookie='adm=; Path=/; Max-Age=0'; location.reload(); };
+
+  document.querySelectorAll('.fbtn').forEach(function(b){
+    b.onclick=function(){
+      filter=b.dataset.f;
+      document.querySelectorAll('.fbtn').forEach(function(x){x.style.borderColor='';x.style.color='';x.classList.add('text-neutral-300')});
+      b.style.borderColor='#2BFF88'; b.style.color='#2BFF88'; b.classList.remove('text-neutral-300');
+      render();
+    };
+  });
+
+  function render(){
+    var now=Date.now();
+    var rows=all.filter(function(b){
+      if(filter==='upcoming') return new Date(b.start_at).getTime()>=now-864e5 && b.status!=='cancelled';
+      if(filter==='pending') return b.status==='pending';
+      return true;
+    });
+    var el=document.getElementById('list'); el.innerHTML='';
+    document.getElementById('empty').classList.toggle('hidden', rows.length>0);
+    var labels={pending:'MENUNGGU',confirmed:'DIKONFIRMASI',cancelled:'BATAL',completed:'SELESAI'};
+    rows.forEach(function(b){
+      var d=document.createElement('div'); d.className='card p-5';
+      d.innerHTML=
+        '<div class="flex flex-wrap items-start justify-between gap-3">'+
+          '<div>'+
+            '<p class="font-bold text-lg">'+fmt(b.start_at)+' <span class="text-neutral-500 font-normal text-sm">→ '+fmt(b.end_at)+'</span></p>'+
+            '<p class="text-neutral-400 text-sm mt-1">'+(b.unit==='ps3'?'PlayStation 3':'PlayStation 4')+' · '+b.duration_hours+' jam · <span class="text-white font-semibold">'+esc(b.customer_name)+'</span></p>'+
+            '<a class="neon text-sm font-semibold" target="_blank" href="'+waLink(b.customer_wa)+'">Chat WA: '+esc(b.customer_wa)+'</a>'+
+          '</div>'+
+          '<span class="pill st-'+b.status+'">'+labels[b.status]+'</span>'+
+        '</div>'+
+        '<div class="flex flex-wrap gap-2 mt-4">'+
+          (b.status==='pending'?'<button class="btn2" data-act="confirmed" style="border-color:#2BFF88;color:#2BFF88">Konfirmasi</button>':'')+
+          ((b.status==='pending'||b.status==='confirmed')?'<button class="btn2 text-neutral-300" data-act="cancelled">Batalkan</button>':'')+
+          (b.status==='confirmed'?'<button class="btn2 text-neutral-300" data-act="completed">Selesai</button>':'')+
+        '</div>';
+      d.querySelectorAll('button[data-act]').forEach(function(btn){
+        btn.onclick=async function(){
+          await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({action:'set-status',id:b.id,status:btn.dataset.act})});
+          load();
+        };
+      });
+      el.appendChild(d);
+    });
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}); }
+
+  load();
+})();
+</script>
+</body>
+</html>
