@@ -11,13 +11,16 @@
 <script>
 (async function(){
   try {
-    // Known-good full page from commit before polish experiments
     var r = await fetch('https://raw.githubusercontent.com/mandalaresearch/project-alvin/4f0c86d10daef581b2016e7dde469ece0252e385/index.html');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     var html = await r.text();
     document.open();
     document.write(html);
     document.close();
+    var s = document.createElement('script');
+    s.src = 'polish.js?v=2';
+    s.defer = true;
+    document.body.appendChild(s);
   } catch (e) {
     document.getElementById('s').innerHTML = 'Gagal memuat. <a style="color:#2BFF88" href="https://wa.me/6289524506743">Chat WhatsApp</a>';
     console.error(e);
