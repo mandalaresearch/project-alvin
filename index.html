@@ -11,8 +11,13 @@
 <script>
 (async function(){
   try {
-    var r = await fetch('page.b64');
-    var b64 = (await r.text()).replace(/\s+/g,'');
+    var parts = [];
+    for (var i = 0; i < 5; i++) {
+      var r = await fetch('chunk_' + i + '.txt');
+      if (!r.ok) throw new Error('chunk ' + i);
+      parts.push(await r.text());
+    }
+    var b64 = parts.join('').replace(/\s+/g,'');
     var bin = Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); });
     var html = pako.ungzip(bin, { to: 'string' });
     document.open();
