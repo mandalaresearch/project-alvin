@@ -1,1 +1,28 @@
-LOADING
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandala PlayStation — Rental PS3 & PS4</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+</head>
+<body style="background:#0B0B0D;color:#2BFF88;font-family:system-ui;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0">
+<p id="s">Memuat MandalaPS…</p>
+<script>
+(async function(){
+  try {
+    var r = await fetch('page.b64');
+    var b64 = (await r.text()).replace(/\s+/g,'');
+    var bin = Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); });
+    var html = pako.ungzip(bin, { to: 'string' });
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(e) {
+    document.getElementById('s').textContent = 'Gagal memuat. Refresh atau hubungi admin.';
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
