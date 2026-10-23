@@ -4,7 +4,6 @@
 
   var css = document.createElement('style');
   css.textContent = `
-    /* ===== base polish ===== */
     .card-dark { transition: transform .35s cubic-bezier(.22,.8,.28,1), border-color .35s ease, box-shadow .35s ease; }
     .card-dark:hover { transform: translateY(-4px); border-color: rgba(43,255,136,.28); box-shadow: 0 20px 50px rgba(0,0,0,.35); }
     .btn-neon { position: relative; overflow: hidden; }
@@ -13,8 +12,6 @@
     @keyframes mpsShine { to { transform:translateX(120%); } }
     .btn-neon:hover { box-shadow: 0 12px 40px rgba(43,255,136,.4) !important; }
     .btn-outline:hover { border-color: #2BFF88 !important; color: #2BFF88 !important; }
-
-    /* ===== testimonials ===== */
     .mps-testi { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
     .mps-testi .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: #8b8b93; margin-bottom: .75rem; }
     .mps-testi h2 { font-family: 'Alte Haas Grotesk', 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; text-transform: uppercase; font-size: clamp(2rem,5vw,3rem); line-height: .95; margin-bottom: 2.5rem; }
@@ -30,111 +27,86 @@
     .pulse-ring::before { content:""; position:absolute; inset:-4px; border-radius:9999px; border:1px solid rgba(43,255,136,.45); animation: mpsRing 2s ease-out infinite; }
     @keyframes mpsRing { 0% { transform:scale(.9); opacity:.8; } 100% { transform:scale(1.4); opacity:0; } }
 
-    /* ===== DARKBLOOM-STYLE 3D SCROLL ===== */
     html { scroll-behavior: smooth; }
-    body { perspective: none; }
-
-    /* depth layers */
-    .mps-depth {
-      transform-style: preserve-3d;
-      will-change: transform, opacity;
-      transition: none;
+    .mps-progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+      background: linear-gradient(90deg, #2BFF88, #189a55);
+      z-index: 100; box-shadow: 0 0 12px rgba(43,255,136,.6);
+      transition: width .06s linear;
     }
-
-    /* sticky cinematic panels */
-    .mps-sticky-wrap {
-      position: relative;
-      height: 180vh;
+    .mps-scroll-vignette {
+      position: fixed; inset: 0; pointer-events: none; z-index: 50;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(5,5,8,.65) 100%);
+      opacity: 0; transition: opacity .3s ease;
     }
-    .mps-sticky-inner {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transform-style: preserve-3d;
+    .mps-particle {
+      position: fixed; width: 2px; height: 2px; background: #2BFF88;
+      border-radius: 50%; pointer-events: none; z-index: -1;
+      opacity: .3; box-shadow: 0 0 6px #2BFF88;
     }
-
-    /* parallax hero image */
-    .hero-img, header img, #beranda img {
-      will-change: transform;
-      transform-style: preserve-3d;
-      transition: none !important;
+    .mps-cinematic { position: relative; height: 220vh; margin: 0; }
+    .mps-cinematic-pin {
+      position: sticky; top: 0; height: 100vh; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; transform-style: preserve-3d; perspective: 1600px;
     }
-
-    /* 3D card stack on scroll */
-    .mps-3d-card {
-      transform-style: preserve-3d;
-      will-change: transform, opacity, filter;
+    .mps-cinematic-content {
+      width: 100%; max-width: 72rem; margin: 0 auto; padding: 0 1.5rem;
+      transform-style: preserve-3d; will-change: transform, opacity, filter;
+    }
+    .mps-cinematic-bg {
+      position: absolute; inset: -10%;
+      background: radial-gradient(ellipse at 30% 40%, rgba(43,255,136,.06), transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(43,255,136,.04), transparent 50%);
+      pointer-events: none; will-change: transform, opacity;
+    }
+    .mps-cinematic-label {
+      position: absolute; top: 5.5rem; left: 1.5rem;
+      font-size: 11px; font-weight: 700; letter-spacing: .35em;
+      text-transform: uppercase; color: rgba(43,255,136,.7); z-index: 2;
+    }
+    .mps-3d-card, .mps-title-3d, .hero-img, #beranda img, header img {
+      transform-style: preserve-3d; will-change: transform, opacity, filter;
       backface-visibility: hidden;
     }
-
-    /* section title depth */
-    .mps-title-3d {
-      transform-style: preserve-3d;
-      will-change: transform, opacity;
+    .hero-img, #beranda img, header img { transition: none !important; }
+    .mps-sticky-headline { position: relative; height: 160vh; }
+    .mps-sticky-headline-inner {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 2rem; overflow: hidden;
     }
-
-    /* soft vignette that intensifies with scroll */
-    .mps-scroll-vignette {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 40;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(5,5,8,.55) 100%);
-      opacity: 0;
-      transition: opacity .4s ease;
+    .mps-sticky-headline h2 {
+      font-family: 'Alte Haas Grotesk', 'Barlow Condensed', sans-serif;
+      font-style: italic; font-weight: 800; text-transform: uppercase;
+      font-size: clamp(2.8rem, 9vw, 6.5rem); line-height: .92;
+      letter-spacing: -.02em; margin: 0; will-change: transform, opacity;
     }
-
-    /* progress bar top */
-    .mps-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 2px;
-      width: 0%;
-      background: linear-gradient(90deg, #2BFF88, #189a55);
-      z-index: 60;
-      box-shadow: 0 0 12px rgba(43,255,136,.6);
-      transition: width .08s linear;
+    .mps-sticky-headline .sub {
+      margin-top: 1.5rem; max-width: 28rem; color: #9a9aa3;
+      font-size: 1.05rem; line-height: 1.55; will-change: transform, opacity;
     }
-
-    /* floating depth particles */
-    .mps-particle {
-      position: fixed;
-      width: 2px;
-      height: 2px;
-      background: #2BFF88;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: -1;
-      opacity: .35;
-      box-shadow: 0 0 6px #2BFF88;
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .mps-depth, .mps-3d-card, .mps-title-3d, .hero-img {
-        transform: none !important;
-        opacity: 1 !important;
+      .mps-3d-card, .mps-title-3d, .hero-img, .mps-cinematic-content {
+        transform: none !important; opacity: 1 !important; filter: none !important;
       }
-      .mps-sticky-wrap { height: auto; }
-      .mps-sticky-inner { position: relative; height: auto; }
+      .mps-cinematic, .mps-sticky-headline { height: auto; }
+      .mps-cinematic-pin, .mps-sticky-headline-inner { position: relative; height: auto; }
+    }
+    @media (max-width: 767px) {
+      .mps-cinematic { height: 180vh; }
+      .mps-sticky-headline { height: 140vh; }
     }
   `;
   document.head.appendChild(css);
 
-  /* progress bar */
   var progress = document.createElement('div');
   progress.className = 'mps-progress';
   document.body.appendChild(progress);
-
   var vignette = document.createElement('div');
   vignette.className = 'mps-scroll-vignette';
   document.body.appendChild(vignette);
 
-  /* counter animation */
   function animateCount(el, target, suffix) {
     var dur = 1400, start = performance.now();
     function frame(t) {
@@ -145,8 +117,7 @@
     }
     requestAnimationFrame(frame);
   }
-  var stats = document.querySelectorAll('.display.text-3xl');
-  stats.forEach(function(el) {
+  document.querySelectorAll('.display.text-3xl').forEach(function(el) {
     var t = el.textContent.trim();
     if (t === '500+') { el.textContent = '0'; animateCount(el, 500, '+'); }
     else if (t === '100+') { el.textContent = '0'; animateCount(el, 100, '+'); }
@@ -159,7 +130,6 @@
     }
   });
 
-  /* inject testimonials if missing */
   var harga = document.getElementById('harga');
   if (harga && !document.querySelector('.mps-testi')) {
     var sec = document.createElement('section');
@@ -168,19 +138,19 @@
       <p class="eyebrow">Kata Pelanggan</p>
       <h2 class="mps-title-3d">Main Puas,<br><span class="neon">Balik Lagi.</span></h2>
       <div class="mps-grid">
-        <div class="mps-card mps-3d-card">
+        <div class="mps-card mps-3d-card" data-depth="0.35">
           <div class="mps-stars">★★★★★</div>
           <p class="mps-quote">"Antar cepat, stick bagus, game PES-nya lengkap banget. Sudah langganan sejak 2020."</p>
           <div class="mps-name">Rizky A.</div>
           <div class="mps-role">Pelanggan tetap · Bungkal</div>
         </div>
-        <div class="mps-card mps-3d-card">
+        <div class="mps-card mps-3d-card" data-depth="0.5">
           <div class="mps-stars">★★★★★</div>
           <p class="mps-quote">"Booking online gampang, unit datang lengkap + TV. Cocok buat nonton bareng teman."</p>
           <div class="mps-name">Dwi S.</div>
           <div class="mps-role">Sewa 24 jam · Ngrayun</div>
         </div>
-        <div class="mps-card mps-3d-card">
+        <div class="mps-card mps-3d-card" data-depth="0.65">
           <div class="mps-stars">★★★★★</div>
           <p class="mps-quote">"Harga fair, respon WA cepat. PS4 HEN-nya mulus, gak lag. Recommended!"</p>
           <div class="mps-name">Fajar M.</div>
@@ -190,7 +160,6 @@
     harga.parentNode.insertBefore(sec, harga);
   }
 
-  /* tag hover */
   document.querySelectorAll('#game span, section span').forEach(function(s) {
     if (s.className.indexOf('rounded-full') >= 0 && s.className.indexOf('border') >= 0) {
       s.style.transition = 'all .25s ease';
@@ -207,36 +176,82 @@
     }
   });
 
-  /* ========== 3D SCROLL ENGINE (Darkbloom-inspired) ========== */
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) return;
 
-  // mark elements for depth
+  function wrapCinematic(selector, label) {
+    var el = document.querySelector(selector);
+    if (!el || el.closest('.mps-cinematic')) return null;
+    var wrap = document.createElement('div');
+    wrap.className = 'mps-cinematic';
+    var pin = document.createElement('div');
+    pin.className = 'mps-cinematic-pin';
+    var bg = document.createElement('div');
+    bg.className = 'mps-cinematic-bg';
+    var content = document.createElement('div');
+    content.className = 'mps-cinematic-content';
+    if (label) {
+      var lab = document.createElement('div');
+      lab.className = 'mps-cinematic-label';
+      lab.textContent = label;
+      pin.appendChild(lab);
+    }
+    el.parentNode.insertBefore(wrap, el);
+    content.appendChild(el);
+    pin.appendChild(bg);
+    pin.appendChild(content);
+    wrap.appendChild(pin);
+    return wrap;
+  }
+
+  function insertStickyHeadline(beforeSel, titleHtml, subText) {
+    var before = document.querySelector(beforeSel);
+    if (!before) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'mps-sticky-headline';
+    wrap.innerHTML = `
+      <div class="mps-sticky-headline-inner">
+        <h2 class="mps-hl">${titleHtml}</h2>
+        <p class="sub">${subText}</p>
+      </div>`;
+    before.parentNode.insertBefore(wrap, before);
+  }
+
+  insertStickyHeadline('#harga',
+    'Sewa PS.<br><span class="neon">Main tanpa ribet.</span>',
+    'Pilih paket, booking online, unit diantar. Stick + kabel lengkap.'
+  );
+  insertStickyHeadline('#booking',
+    'Satu klik.<br><span class="neon">Langsung main.</span>',
+    'Isi form, konfirmasi WA, unit siap di depan pintu.'
+  );
+
+  wrapCinematic('#harga', '01 — Harga');
+  wrapCinematic('#booking', '02 — Booking');
+
   var heroImg = document.querySelector('#beranda img, .hero-img, header img');
   if (heroImg) heroImg.classList.add('mps-depth');
 
   document.querySelectorAll('.card-dark, .hud, .mps-card').forEach(function(el, i) {
     el.classList.add('mps-3d-card');
-    el.dataset.depth = (i % 5) * 0.15 + 0.2;
+    if (!el.dataset.depth) el.dataset.depth = ((i % 5) * 0.12 + 0.25).toFixed(2);
   });
-
-  document.querySelectorAll('h1, h2.display, .display.d-hero, .display.d-h2').forEach(function(el) {
+  document.querySelectorAll('h1, h2.display, .display.d-hero, .display.d-h2, .mps-title-3d').forEach(function(el) {
     el.classList.add('mps-title-3d');
   });
 
-  // soft floating particles
-  for (var i = 0; i < 18; i++) {
+  for (var i = 0; i < 22; i++) {
     var p = document.createElement('div');
     p.className = 'mps-particle';
     p.style.left = (Math.random() * 100) + '%';
     p.style.top = (Math.random() * 100) + '%';
-    p.dataset.speed = 0.15 + Math.random() * 0.45;
-    p.dataset.x = Math.random() * 40 - 20;
+    p.dataset.speed = 0.12 + Math.random() * 0.5;
+    p.dataset.x = Math.random() * 50 - 25;
     document.body.appendChild(p);
   }
 
   var ticking = false;
-  var lastY = 0;
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   function onScroll() {
     if (ticking) return;
@@ -248,79 +263,111 @@
     var y = window.scrollY || window.pageYOffset;
     var vh = window.innerHeight;
     var docH = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    var maxScroll = docH - vh;
-    var progressPct = maxScroll > 0 ? (y / maxScroll) * 100 : 0;
+    var maxScroll = Math.max(1, docH - vh);
+    var progressPct = (y / maxScroll) * 100;
 
     progress.style.width = progressPct + '%';
-    vignette.style.opacity = Math.min(0.7, progressPct / 120);
+    vignette.style.opacity = Math.min(0.85, progressPct / 100);
 
-    // hero parallax + slight 3D tilt
     if (heroImg) {
-      var heroRect = heroImg.getBoundingClientRect();
-      var heroCenter = heroRect.top + heroRect.height / 2;
-      var heroOff = (heroCenter - vh / 2) / vh;
-      var py = heroOff * -48;
-      var rotX = heroOff * 6;
-      var rotY = (heroRect.left + heroRect.width / 2 - window.innerWidth / 2) / window.innerWidth * -8;
+      var hr = heroImg.getBoundingClientRect();
+      var hoff = (hr.top + hr.height / 2 - vh / 2) / vh;
+      var py = hoff * -70;
+      var rx = hoff * 9;
+      var ry = ((hr.left + hr.width / 2) - window.innerWidth / 2) / window.innerWidth * -12;
+      var sc = 1 + Math.abs(hoff) * 0.06;
       heroImg.style.transform =
-        'translate3d(0,' + py + 'px,0) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(' + (1 + Math.abs(heroOff) * 0.04) + ')';
+        'translate3d(0,' + py + 'px,40px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + sc + ')';
     }
 
-    // 3D cards – depth based on viewport position
+    document.querySelectorAll('.mps-cinematic').forEach(function(wrap) {
+      var wr = wrap.getBoundingClientRect();
+      var total = wrap.offsetHeight - vh;
+      if (total <= 0) return;
+      var scrolled = clamp(-wr.top, 0, total);
+      var p = scrolled / total;
+      var content = wrap.querySelector('.mps-cinematic-content');
+      var bg = wrap.querySelector('.mps-cinematic-bg');
+      if (content) {
+        var ease = p < 0.5 ? p * 2 : (1 - p) * 2;
+        var tz = (1 - ease) * -180;
+        var sc2 = 0.88 + ease * 0.12;
+        var op = 0.25 + ease * 0.75;
+        var blur = (1 - ease) * 4;
+        content.style.transform = 'translate3d(0,0,' + tz + 'px) scale(' + sc2 + ')';
+        content.style.opacity = op;
+        content.style.filter = 'blur(' + blur + 'px)';
+      }
+      if (bg) {
+        bg.style.transform = 'scale(' + (1.05 + p * 0.15) + ')';
+        bg.style.opacity = 0.4 + p * 0.5;
+      }
+    });
+
+    document.querySelectorAll('.mps-sticky-headline').forEach(function(wrap) {
+      var wr = wrap.getBoundingClientRect();
+      var total = wrap.offsetHeight - vh;
+      if (total <= 0) return;
+      var scrolled = clamp(-wr.top, 0, total);
+      var p = scrolled / total;
+      var h = wrap.querySelector('.mps-hl');
+      var sub = wrap.querySelector('.sub');
+      var enter = clamp(p * 2.2, 0, 1);
+      var exit = clamp((p - 0.55) / 0.45, 0, 1);
+      var sc = 0.75 + enter * 0.3 - exit * 0.15;
+      var ty = (1 - enter) * 80 - exit * 60;
+      var op = enter * (1 - exit * 0.9);
+      var tz = (1 - enter) * -120 - exit * 80;
+      if (h) {
+        h.style.transform = 'translate3d(0,' + ty + 'px,' + tz + 'px) scale(' + sc + ')';
+        h.style.opacity = Math.max(0.05, op);
+      }
+      if (sub) {
+        sub.style.transform = 'translate3d(0,' + (ty * 0.6) + 'px,' + (tz * 0.5) + 'px)';
+        sub.style.opacity = Math.max(0, op * 0.9);
+      }
+    });
+
     document.querySelectorAll('.mps-3d-card').forEach(function(el) {
+      if (el.closest('.mps-cinematic')) return;
       var r = el.getBoundingClientRect();
       var mid = r.top + r.height / 2;
-      var n = (mid - vh / 2) / (vh * 0.75); // -1 .. 1
-      n = Math.max(-1.2, Math.min(1.2, n));
-      var depth = parseFloat(el.dataset.depth || 0.3);
-      var tz = -Math.abs(n) * 80 * depth;
-      var rx = n * -12 * depth;
-      var ry = n * 6 * depth;
-      var sc = 1 - Math.abs(n) * 0.06 * depth;
-      var op = 1 - Math.abs(n) * 0.25 * depth;
+      var n = clamp((mid - vh / 2) / (vh * 0.7), -1.3, 1.3);
+      var depth = parseFloat(el.dataset.depth || 0.4);
+      var tz = -Math.abs(n) * 110 * depth;
+      var rx = n * -14 * depth;
+      var ry = n * 7 * depth;
+      var sc = 1 - Math.abs(n) * 0.08 * depth;
+      var op = 1 - Math.abs(n) * 0.3 * depth;
       el.style.transform =
-        'perspective(1200px) translateZ(' + tz + 'px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + sc + ')';
-      el.style.opacity = Math.max(0.35, op);
-      el.style.filter = 'blur(' + (Math.abs(n) * 1.8 * depth) + 'px)';
+        'perspective(1400px) translateZ(' + tz + 'px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + sc + ')';
+      el.style.opacity = Math.max(0.3, op);
+      el.style.filter = 'blur(' + (Math.abs(n) * 2.2 * depth) + 'px)';
     });
 
-    // titles – rise & settle with depth
     document.querySelectorAll('.mps-title-3d').forEach(function(el) {
+      if (el.closest('.mps-sticky-headline')) return;
       var r = el.getBoundingClientRect();
-      var n = (r.top + r.height / 2 - vh / 2) / vh;
-      n = Math.max(-1, Math.min(1, n));
-      var ty = n * 28;
-      var tz = -Math.abs(n) * 40;
-      var op = 1 - Math.abs(n) * 0.4;
+      var n = clamp((r.top + r.height / 2 - vh / 2) / vh, -1, 1);
+      var ty = n * 36;
+      var tz = -Math.abs(n) * 55;
+      var op = 1 - Math.abs(n) * 0.45;
       el.style.transform = 'translate3d(0,' + ty + 'px,' + tz + 'px)';
-      el.style.opacity = Math.max(0.4, op);
+      el.style.opacity = Math.max(0.35, op);
     });
 
-    // particles drift
     document.querySelectorAll('.mps-particle').forEach(function(p) {
       var speed = parseFloat(p.dataset.speed);
       var xOff = parseFloat(p.dataset.x);
-      var py = (y * speed) % (vh + 40) - 20;
-      p.style.transform = 'translate3d(' + (xOff * (y / 400)) + 'px,' + (-py) + 'px,0)';
+      var py = (y * speed) % (vh + 50) - 25;
+      p.style.transform = 'translate3d(' + (xOff * (y / 350)) + 'px,' + (-py) + 'px,0)';
     });
 
-    lastY = y;
     ticking = false;
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
+  setTimeout(update3D, 80);
   update3D();
-
-  // intersection reveal for smoother entrance
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) e.target.classList.add('in');
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    document.querySelectorAll('.rv, .mps-3d-card, .mps-title-3d').forEach(function(el) {
-      io.observe(el);
-    });
-  }
 })();
