@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script>
+      /* background mode (?bg=1): flag before first paint so no UI flashes */
+      try {
+        if (new URLSearchParams(window.location.search).get("bg") === "1") {
+          document.documentElement.classList.add("bg-mode");
+        }
+      } catch (e) { /* ignore */ }
+    </script>
     <style>
       :root {
         --panel: rgba(6, 20, 13, 0.85);
@@ -21,15 +29,25 @@
       }
       * { box-sizing: border-box; }
       html, body { height: 100%; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         font-family: "Plus Jakarta Sans", system-ui, sans-serif;
         background: #0b1f13;
         color: var(--ink);
+        overflow-x: clip;
+      }
+
+      /* ---------- hero: the 3D stadium is this section's background ---------- */
+      .hero {
+        position: relative;
+        height: 92svh;
+        min-height: 540px;
         overflow: hidden;
+        background: #0b1f13;
       }
       #scene {
-        position: fixed;
+        position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
@@ -39,8 +57,53 @@
       }
       #scene:active { cursor: grabbing; }
       #scene.pixel { image-rendering: pixelated; }
+      .hero-shade {
+        position: absolute; inset: 0; z-index: 5;
+        pointer-events: none;
+        background:
+          linear-gradient(100deg, rgba(5, 18, 10, 0.62) 0%, rgba(5, 18, 10, 0.30) 42%, rgba(5, 18, 10, 0) 68%),
+          linear-gradient(to top, rgba(8, 23, 13, 0.92), rgba(8, 23, 13, 0) 26%);
+      }
+      .hero-copy {
+        position: absolute; z-index: 11;
+        left: 24px; top: 50%;
+        transform: translateY(-50%);
+        max-width: 520px;
+        pointer-events: none;
+      }
+      .hero-copy h1 {
+        margin: 0 0 14px;
+        font-size: clamp(32px, 5.2vw, 56px);
+        line-height: 1.05; font-weight: 800; letter-spacing: -0.01em;
+        text-wrap: balance;
+      }
+      .hero-copy p {
+        margin: 0 0 22px;
+        font-size: clamp(14.5px, 1.6vw, 17px);
+        line-height: 1.6; color: #d9eedd;
+        max-width: 46ch;
+      }
+      .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; pointer-events: auto; }
+      .btn {
+        appearance: none;
+        font: inherit; font-size: 14px; font-weight: 700;
+        padding: 11px 18px; border-radius: 12px;
+        cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .btn svg { width: 15px; height: 15px; stroke: currentColor; flex: none; }
+      .btn-primary { background: var(--accent); border: 1px solid var(--accent); color: #052e16; }
+      .btn-primary:hover { background: #54da8c; }
+      .btn-ghost {
+        background: rgba(6, 20, 13, 0.66); color: var(--ink);
+        border: 1px solid rgba(130, 230, 165, 0.3);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      }
+      .btn-ghost:hover { background: rgba(130, 230, 165, 0.16); }
+      .btn:focus-visible { outline: 2px solid var(--accent-warm); outline-offset: 2px; }
 
-      .hud { position: fixed; z-index: 10; }
+      .hud { position: absolute; z-index: 10; }
 
       /* ---------- status chip (top-left) ---------- */
       .status-chip {
@@ -206,28 +269,123 @@
       #fallback h1 { font-size: 20px; margin: 0 0 8px; }
       #fallback p { color: var(--ink-dim); line-height: 1.6; font-size: 14px; }
 
+      /* ---------- page content below the hero ---------- */
+      .content { background: #08170d; }
+      .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+      .section { padding: 60px 0 6px; }
+      .section h2 {
+        margin: 0 0 12px;
+        font-size: clamp(24px, 3.4vw, 34px);
+        font-weight: 800; line-height: 1.15; letter-spacing: -0.01em;
+      }
+      .section .lead {
+        margin: 0; max-width: 68ch;
+        font-size: 15.5px; line-height: 1.65; color: var(--ink-dim);
+      }
+      .stats {
+        display: grid; gap: 12px; margin-top: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      .stat {
+        background: rgba(130, 230, 165, 0.05);
+        border: 1px solid var(--panel-border);
+        border-radius: 14px; padding: 16px 18px;
+      }
+      .stat b {
+        display: block; margin-bottom: 4px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 26px; font-weight: 700; color: var(--accent);
+      }
+      .stat span { font-size: 13px; color: var(--ink-dim); line-height: 1.45; }
+      .cards {
+        display: grid; gap: 12px; margin-top: 26px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .card {
+        background: rgba(130, 230, 165, 0.04);
+        border: 1px solid var(--panel-border);
+        border-radius: 14px; padding: 16px 18px;
+      }
+      .card .tag {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+        color: var(--accent);
+        border: 1px solid rgba(63, 206, 125, 0.35);
+        padding: 3px 8px; border-radius: 999px;
+        text-transform: uppercase;
+      }
+      .card h3 { margin: 10px 0 6px; font-size: 16.5px; font-weight: 800; }
+      .card p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); }
+      .guide {
+        display: grid; gap: 0 28px; margin-top: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .guide .row {
+        display: flex; gap: 14px;
+        padding: 13px 0;
+        border-top: 1px solid rgba(130, 230, 165, 0.12);
+      }
+      .guide b { flex: none; min-width: 118px; font-size: 14px; font-weight: 700; }
+      .guide p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); }
+      .page-footer {
+        margin-top: 60px;
+        padding: 28px 0 42px;
+        border-top: 1px solid rgba(130, 230, 165, 0.12);
+        font-size: 13px; line-height: 1.6; color: var(--ink-dim);
+      }
+      .page-footer b { color: var(--ink); }
+
       @media (max-width: 640px) {
+        .hero { min-height: 500px; }
+        .hero-copy { left: 16px; right: 16px; top: 46%; max-width: none; }
+        .hero-copy p {
+          font-size: 14px;
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .section { padding-top: 44px; }
         .status-chip { max-width: calc(100vw - 172px); }
         .status-chip .row { font-size: 12.5px; }
         .status-chip .hint { display: none; }
         .info-panel {
-          top: calc(max(12px, env(safe-area-inset-top)) + 92px);
+          top: 44%;
           bottom: auto; right: 50%;
-          max-height: 46vh; overflow-y: auto;
-          transform: translateX(50%) translateY(-8px);
+          z-index: 13;
+          max-height: 54vh; overflow-y: auto;
+          transform: translateX(50%) translateY(-47%);
         }
-        .info-panel.open { transform: translateX(50%) translateY(0); }
+        .info-panel.open { transform: translateX(50%) translateY(-50%); }
         .controls { gap: 8px 10px; padding: 8px; border-radius: 16px; }
         .seg button { padding: 6px 9px; font-size: 12px; }
       }
       @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
         .status-dot { animation: none; }
         .info-panel { transition: none; }
       }
+
+      /* ---------- background mode (?bg=1): 3D match canvas only ----------
+         Everything except the canvas is removed: no headline, no HUD,
+         no info panel, no controls, no content below. The canvas fills
+         the viewport and ignores the pointer so host-page content
+         layered above it stays interactive. */
+      html.bg-mode, html.bg-mode body { height: 100%; }
+      html.bg-mode body { overflow: hidden; }
+      html.bg-mode .hero { height: 100svh; min-height: 0; }
+      html.bg-mode .hero-copy,
+      html.bg-mode .hero-shade,
+      html.bg-mode .hud,
+      html.bg-mode .content { display: none; }
+      html.bg-mode #scene { pointer-events: none; cursor: default; }
     </style>
   </head>
   <body>
+    <header class="hero" id="hero">
     <canvas id="scene" aria-label="Diorama stadion sepak bola isometrik 3D interaktif"></canvas>
+    <div class="hero-shade" aria-hidden="true"></div>
 
     <div class="hud status-chip" role="status">
       <div class="row"><span class="status-dot"></span><span id="matchStatus">Kick-off! Pertandingan dimulai</span></div>
@@ -244,10 +402,22 @@
       <span id="wxLabel">Cerah · 29°C</span>
     </div>
 
+    <div class="hero-copy">
+      <h1>Stadion Mini di Atas Awan</h1>
+      <p>Stadion 3D ini sekarang jadi latar hero-nya — dan pertandingannya tetap berjalan live di belakang teks ini: Merah vs Biru, 7 lawan 7, lengkap dengan gol, penyelamatan kiper, dan papan skor yang bergerak. Seret untuk memutar kamera, klik tribun, lapangan, atau pemainnya untuk melihat info.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" id="ctaScroll" type="button">
+          Lihat isi stadion
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+        </button>
+        <button class="btn btn-ghost" id="ctaNight" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <span id="ctaNightLabel">Coba mode malam</span>
+        </button>
+      </div>
+    </div>
+
     <aside class="hud info-panel open" id="infoPanel" aria-live="polite">
-      <button class="info-close" id="infoClose" aria-label="Tutup info">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
-      </button>
       <span class="tag" id="infoTag">Selamat Datang</span>
       <h2 id="infoTitle">Stadion Mini di Atas Awan</h2>
       <p id="infoDesc">Diorama stadion isometrik yang hidup: dua tim mini (Merah vs Biru) bertanding sungguhan — menggiring bola, mengumpan, menembak, dan mencetak gol. Skor dan menit pertandingan berjalan live di kiri atas dan di papan skor stadion. Klik tribun, lapangan, papan skor, menara lampu, gawang, bola, atau pemainnya untuk info.</p>
@@ -302,6 +472,87 @@
         </div>
       </div>
     </nav>
+    </header>
+
+    <main class="content">
+      <section class="section" id="tentang">
+        <div class="wrap">
+          <h2>Satu stadion, satu pertandingan yang tidak berhenti</h2>
+          <p class="lead">Diorama stadion ini dirender 3D langsung di browser dan simulasinya berjalan sendiri: pemain menggiring bola, mengumpan ke rekan setim (sesekali dipotong lawan), menembak ke gawang, kiper menyelamatkan, dan gol mengubah skor di panel status maupun di papan skor raksasa stadion. Selesai menit ke-90, pertandingan baru dimulai lagi dari awal — skornya tidak pernah disimpan, jadi setiap kunjungan adalah laga yang berbeda.</p>
+          <div class="stats">
+            <div class="stat"><b>7 vs 7</b><span>Pemain di lapangan, Merah melawan Biru</span></div>
+            <div class="stat"><b>4</b><span>Mode cuaca &amp; waktu: cerah, senja, hujan, malam</span></div>
+            <div class="stat"><b>7</b><span>Jenis objek yang bisa diklik untuk info</span></div>
+            <div class="stat"><b>90'</b><span>Durasi tiap pertandingan sebelum mulai lagi</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="objek">
+        <div class="wrap">
+          <h2>Yang bisa diklik di dalam stadion</h2>
+          <p class="lead">Klik objeknya langsung di hero di atas — panel info akan muncul di sisi kanan stadion. Ini tujuh jenis objek yang terdaftar:</p>
+          <div class="cards">
+            <article class="card">
+              <span class="tag">Lapangan</span>
+              <h3>Lapangan Utama</h3>
+              <p>Rumput alami 52 × 32 m dengan pola potong 13 lajur dan garis standar pertandingan — panggung utama laga 7 vs 7.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Tribun</span>
+              <h3>Tribun Penonton</h3>
+              <p>Lima tingkat tribun mengelilingi lapangan, berkapasitas ± 12.000 penonton mini; tribun utara dan selatan beratap.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Papan Skor</span>
+              <h3>Papan Skor Elektronik</h3>
+              <p>Papan raksasa 11 × 5,5 m di sudut stadion. Skor dan menitnya live, berubah mengikuti jalannya pertandingan.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Pencahayaan</span>
+              <h3>Menara Lampu Sorot</h3>
+              <p>Empat menara setinggi 12 m. Lampunya menyala saat senja, hujan, dan terutama mode malam — coba dari tombol cuaca.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Gawang</span>
+              <h3>Gawang Pertandingan</h3>
+              <p>Gawang standar 7,32 × 2,44 m dengan jaring nilon putih. Setiap gol dirayakan sebelum kick-off ulang dari titik tengah.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Bola</span>
+              <h3>Bola Pertandingan</h3>
+              <p>Bola ukuran 5 yang selalu diperebutkan: digiring, diumpan, ditembak — ikuti gerakannya untuk membaca arah serangan.</p>
+            </article>
+            <article class="card">
+              <span class="tag">Pemain</span>
+              <h3>Para Pemain</h3>
+              <p>Dari kiper sampai penyerang, tiap pemain bisa diklik untuk melihat posisi, nomor punggung, dan timnya.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="panduan">
+        <div class="wrap">
+          <h2>Cara mengendalikan hero-nya</h2>
+          <p class="lead">Semua kontrol ada di bilah bawah hero, dan kamera stadionnya sendiri bisa digerakkan langsung:</p>
+          <div class="guide">
+            <div class="row"><b>Seret</b><p>Geser di atas stadion untuk memutar kamera mengelilingi pulau; putar otomatis berhenti begitu kamu mengambil alih.</p></div>
+            <div class="row"><b>Cubit / gulir</b><p>Zoom masuk dan keluar — di HP pakai dua jari, di desktop pakai roda mouse di atas hero.</p></div>
+            <div class="row"><b>Cuaca &amp; waktu</b><p>Cerah, Senja, Hujan (dengan partikel hujannya), atau Malam dengan lampu sorot dan bintang. Siklus Waktu menggantinya otomatis bergantian.</p></div>
+            <div class="row"><b>Kamera</b><p>Tiga preset: Isometrik, Dari Atas, dan Dekat Lapangan untuk melihat pertandingan dari dekat garis.</p></div>
+            <div class="row"><b>Mode Pixel</b><p>Menurunkan resolusi render supaya stadionnya terasa seperti pixel-art, seperti referensi video aslinya.</p></div>
+            <div class="row"><b>Main / Jeda</b><p>Menghentikan atau melanjutkan simulasi pertandingan kapan saja, tanpa mengulang dari awal.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <div class="wrap">
+          <b>Stadion Isometrik Interaktif</b> — diorama 3D yang dirender real-time di browser dengan Three.js. Pertandingan di hero berjalan otomatis dan berulang; tidak ada data yang disimpan.
+        </div>
+      </footer>
+    </main>
 
     <div id="fallback"><div class="box">
       <h1>Diorama tidak bisa dimuat</h1>
@@ -312,6 +563,11 @@
     <script>
     (function () {
       "use strict";
+      var ctaScroll = document.getElementById("ctaScroll");
+      if (ctaScroll) ctaScroll.addEventListener("click", function () {
+        var target = document.getElementById("tentang");
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
       if (typeof THREE === "undefined") {
         document.getElementById("fallback").style.display = "grid";
         return;
@@ -324,6 +580,7 @@
          RENDERER & SCENE
       ============================================================ */
       var canvas = document.getElementById("scene");
+      var heroEl = document.getElementById("hero");
       var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.shadowMap.enabled = true;
@@ -336,7 +593,8 @@
       var viewHalfH = 34;
       var pixelMode = false;
       function layoutCamera() {
-        var w = window.innerWidth, h = window.innerHeight;
+        var w = heroEl.clientWidth || window.innerWidth;
+        var h = heroEl.clientHeight || window.innerHeight;
         var aspect = w / h;
         viewHalfH = Math.max(33, 50 / aspect);
         camera.left = -viewHalfH * aspect;
@@ -897,6 +1155,16 @@
         setWeather(b.dataset.wx);
       });
 
+      /* hero CTA: quick night-mode toggle */
+      var ctaNight = document.getElementById("ctaNight");
+      var ctaNightLabel = document.getElementById("ctaNightLabel");
+      if (ctaNight) ctaNight.addEventListener("click", function () {
+        cycleOn = false; document.getElementById("btnCycle").classList.remove("active");
+        var toNight = wxName !== "malam";
+        setWeather(toNight ? "malam" : "cerah");
+        if (ctaNightLabel) ctaNightLabel.textContent = toNight ? "Kembali cerah" : "Coba mode malam";
+      });
+
       /* day-cycle mode */
       var cycleOn = false, cycleTimer = 0;
       var cycleOrder = ["cerah", "senja", "malam", "hujan"];
@@ -918,6 +1186,9 @@
       ============================================================ */
       var cam = { theta: Math.PI / 4, phi: 0.955, zoom: 1, tx: 0, ty: 1, tz: 0 };
       var camGoal = { theta: cam.theta, phi: cam.phi, zoom: 1, tx: 0, ty: 1, tz: 0 };
+      /* background mode: the camera only ever drifts in a slow auto-orbit */
+      var bgMode = document.documentElement.classList.contains("bg-mode");
+      var orbitSpeed = bgMode ? 0.05 : 0.12;
       var autoRotate = true;
       var CAM_VIEWS = {
         iso: { theta: Math.PI / 4, phi: 0.955, zoom: 1, tx: 0, ty: 1, tz: 0 },
@@ -984,7 +1255,7 @@
       }, { passive: false });
 
       function updateCamera(dt) {
-        if (autoRotate && pointers.size === 0) camGoal.theta += dt * 0.12;
+        if (autoRotate && pointers.size === 0) camGoal.theta += dt * orbitSpeed;
         var k = 1 - Math.exp(-dt * 5);
         cam.theta += (camGoal.theta - cam.theta) * k;
         cam.phi += (camGoal.phi - cam.phi) * k;
@@ -1008,6 +1279,9 @@
       ============================================================ */
       var raycaster = new THREE.Raycaster();
       var panel = document.getElementById("infoPanel");
+      /* on phones the welcome panel starts closed so the hero headline and CTAs
+         stay fully visible; it opens when a stadium object is tapped */
+      if (window.innerWidth <= 640) panel.classList.remove("open");
       var selected = null, selectedMats = [];
       function clearHighlight() {
         selectedMats.forEach(function (sm) { sm.mat.emissive.setHex(sm.hex); });
@@ -1032,10 +1306,24 @@
           var dd = document.createElement("dd"); dd.textContent = s[1];
           dl.appendChild(dt2); dl.appendChild(dd);
         });
+        ensureCloseBtn();
         panel.classList.add("open");
       }
       function closeInfo() { panel.classList.remove("open"); clearHighlight(); }
-      document.getElementById("infoClose").addEventListener("click", closeInfo);
+      /* the close button is created lazily: it only exists while the panel can
+         be open, so a closed panel never carries an unreachable control */
+      var closeBtn = null;
+      function ensureCloseBtn() {
+        if (closeBtn) return;
+        closeBtn = document.createElement("button");
+        closeBtn.className = "info-close";
+        closeBtn.id = "infoClose";
+        closeBtn.setAttribute("aria-label", "Tutup info");
+        closeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+        closeBtn.addEventListener("click", closeInfo);
+        panel.appendChild(closeBtn);
+      }
+      if (panel.classList.contains("open")) ensureCloseBtn();
       function handlePick(cx, cy) {
         var rect = canvas.getBoundingClientRect();
         var mouse = new THREE.Vector2(
